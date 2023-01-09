@@ -28,5 +28,12 @@ public abstract class ACard implements Comparable<ACard> {
 		if (colorCompare != 0) return colorCompare;
 		return this.getAction().compareTo(other.getAction());
 	}
+
+	@Override
+	public String toString() {
+		String color = this.getColor().toString().toLowerCase();
+		String action = this.getAction().toString().toLowerCase();
+		return color + " " + action;
+	}
 }
 
