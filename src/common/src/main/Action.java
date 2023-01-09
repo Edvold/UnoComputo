@@ -11,7 +11,7 @@ public enum Action {
 	SEVEN,
 	EIGHT,
 	NINE,
-	THEN,
+	TEN,
 	DRAW2,
 	REVERSE,
 	SKIP,
