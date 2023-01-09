@@ -1,11 +1,13 @@
 package common.src.main;
 
+import java.util.ArrayList;
+
 public interface IPlayer {
 
-    boolean verify();
+    boolean verify(ACard card, ACard topCard);
 
-    ACard[] getPlayableCards();
+    ArrayList<ACard> getPlayableCards(ACard[] hand, ACard topCard);
 
-    String computeReturnToken(); //can maybe be omitted
+    String computeReturnToken(String ID); //can maybe be omitted
     
 }
