@@ -1,0 +1,20 @@
+package common.src.main;
+
+enum Action {
+	ZERO,
+	ONE,
+	TWO,
+	THREE,
+	FOUR,
+	FIVE,
+	SIX,
+	SEVEN,
+	EIGHT,
+	NINE,
+	THEN,
+	DRAW2,
+	REVERSE,
+	SKIP,
+	WILD,
+	WILDDRAW4
+}
