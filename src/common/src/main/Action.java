@@ -1,6 +1,6 @@
 package common.src.main;
 
-enum Action {
+public enum Action {
 	ZERO,
 	ONE,
 	TWO,

@@ -1,6 +1,6 @@
 package common.src.main;
 
-enum Color {
+public enum Color {
 	RED,
 	BLUE,
 	GREEN,
