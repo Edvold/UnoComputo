@@ -22,12 +22,13 @@ public class Player implements IPlayer {
     private SequentialSpace playerInbox = new SequentialSpace();
     public Space UISpace;
     public Space gameSpace;
+    private UI ui;
 
     public Player (String name, int playerNumber) {
         playerName = name;
         this.playerNumber = playerNumber;
         playerRepo.add("playerInbox" + playerNumber,playerInbox);
-        ui = new UI("playerInbox" + playerNumber);
+        this.ui = new UI("playerInbox" + playerNumber);
         String UIChannelName;
         try {
             UIChannelName = (String) playerInbox.get(new FormalField(String.class))[0];
