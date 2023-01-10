@@ -10,6 +10,10 @@ interface IGame {
     Stack<ACard> discardPile = new Stack<>();
 
     void generateDeck();
+    
+    /**
+     * Takes all but the top card of the discardPile and shuffles them into the deck
+     */
     void shuffleDeck();
     ACard[] draw(int amount);
     void startNextRound(IPlayer[] players); // Needs to take into account skipping & reversing
