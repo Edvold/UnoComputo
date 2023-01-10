@@ -22,7 +22,6 @@ public class Player implements IPlayer {
     private SequentialSpace playerInbox = new SequentialSpace();
     public Space UISpace;
     public Space gameSpace;
-    private UI ui;
 
     public Player (String name, int playerNumber) {
         playerName = name;
