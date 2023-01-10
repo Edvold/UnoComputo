@@ -6,11 +6,12 @@ import java.util.Scanner;
 
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
+import org.jspace.SpaceRepository;
 
 public class UI {
     
     RemoteSpace outbox;
-    SequentialSpace inbox;
+    SequentialSpace UIInbox;
     GameState state;
     String username;
 
@@ -21,8 +22,16 @@ public class UI {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        inbox = new SequentialSpace();
+        
+        SpaceRepository repo = new SpaceRepository();
+        UIInbox = new SequentialSpace();
+        repo.add("UIInbox", UIInbox);
+        repo.addGate("tcp://localhost/?keep");
+        try {
+            outbox.put("UIInbox");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
