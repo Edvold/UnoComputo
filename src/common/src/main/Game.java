@@ -83,19 +83,24 @@ public class Game implements IGame{
     @Override
     public void startNextRound(Map<String, IPlayerConnection> players, Space inbox) throws InterruptedException {
         String currentPlayer = playerNames.get(0);
-        //GameState gameState = new GameState(currentPlayer, null, null, 0);
-        
+        players.get(currentPlayer).getPlayerInbox().put("turnToken");
+
         //send to all
         for(IPlayerConnection player : players.values()){
+            player.getPlayerInbox().put("Current gameState");
             // TODO insert:  player.getPlayerInbox().put("begun", currentPlayer, gameState); 
         }
         
         //inbox.get(IMessage.getGeneralTemplate().getFields());
         
-        String userName = "example";
-        players.get(userName).getPlayerInbox().put(""); //send to specific player
-
         
+        // awaits a description of players current turn
+        Object[] obj = inbox.get(new FormalField(ITurnDesription.class));
+        
+
+        //Send no time left to controller
+        // or
+        // Update internal gameState
 
         // first figure out next player (what is the player order and which direction are we going)
         // send message to all that new round has begun. (include turn token in message to new current player)
