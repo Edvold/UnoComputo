@@ -11,7 +11,7 @@ import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
 
-public class UI {
+public class GameUI {
     
     RemoteSpace outbox;
     SequentialSpace inbox;
@@ -20,7 +20,7 @@ public class UI {
     final static String wrongInput = "Sorry that is not an option. Try again!";
 
 
-    public UI(String channel) {
+    public GameUI(String channel) {
         try {
             outbox = new RemoteSpace("tcp://localhost/" + channel + "?keep");
         } catch (IOException e) {
@@ -39,69 +39,8 @@ public class UI {
 
     }
 
-    public void runLobby() {
-        // UI for the lobby
 
-        Scanner scanner = new Scanner(System.in);
-
-        boolean getChoice = true;
-        System.out.println("Hello and welcome to UNO!\n");
-
-        System.out.println("What is your name? ");
-        username = scanner.next();
-        System.out.println("Succesfully changed your name to: " + username);
-
-        while (gotChoice) {
-            System.out.println("Choose an option\n 1. Create a lobby\n 2. Join a lobby");
-            try {
-                int input = scanner.nextInt();
-                getChoice = false;
-                switch(input) {
-                    case 1: 
-                        createLobby();
-                        break;
-                    case 2:
-                    joinLobby();
-                    break;
-                    default:
-                        getChoice = true;
-                        System.out.println(wrongInput);
-                }
-
-            } catch (InputMismatchException e) {
-                e.printStackTrace();
-            } finally {
-                scanner.close();
-            }
-        }
-
-    }
-    
-    void createLobby() {
-        System.out.println("What do you wany your lobby to be named? ");
-        Scanner scanner = new Scanner(System.in);
-
-        String name = scanner.nextLine();
-        System.out.println("Creating lobby with name " + name + "...");
-        // Send message to lobby to create a new lobby with name name
-
-
-        scanner.close();
-    }
-
-    void joinLobby() {
-        System.out.println("What lobby do you want to join? ");
-        Scanner scanner = new Scanner(System.in);
-
-        String name = scanner.nextLine();
-        System.out.println("Joining lobby with name" + name + "...");
-
-        // Send message to lobby to join lobby with name name
-
-        scanner.close();
-    }
-
-    public void runGame() {
+    public void takeTurn() {
         // UI for the actual UNO game
 
         boolean getChoice = true;
