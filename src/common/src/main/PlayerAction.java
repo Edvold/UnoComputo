@@ -5,7 +5,7 @@ public enum PlayerAction {
     DRAW("Draw a card"),
     UNO("Say \"uno!\""),
     OBJECT("Object"),
-    ENDTURN("End your turn")
+    ENDTURN("End your turn");
 
     private String description;
 
