@@ -3,11 +3,9 @@ package common.src.main;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.Remote;
 import java.util.Scanner;
 
 import org.jspace.FormalField;
-import org.jspace.RandomSpace;
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
