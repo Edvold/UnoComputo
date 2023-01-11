@@ -11,7 +11,7 @@ import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
 
-public class GameUI {
+public class GameUI{
     
     RemoteSpace outbox;
     SequentialSpace inbox;
@@ -37,6 +37,13 @@ public class GameUI {
             e.printStackTrace();
         }
 
+    }
+
+    public void run() {
+        // Get message
+        // If it is player's turn call takeTurn
+        // otherwise call some other method
+        
     }
 
 
@@ -131,19 +138,36 @@ public class GameUI {
     }
 
     private void drawCard() {
-
+        try {
+            outbox.put("draw", -1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sayUno() {
-
+        try {
+            outbox.put("uno", -1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void object() {
-
+        try {
+            outbox.put("object", -1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void endTurn() {
-
+        try {
+            outbox.put("end", -1);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void printHand(ArrayList<ACard> hand) {
@@ -154,6 +178,9 @@ public class GameUI {
             System.out.println(counter++ + ". " + card.toString());
         }
     }
+
+
+ 
 
 
 }
