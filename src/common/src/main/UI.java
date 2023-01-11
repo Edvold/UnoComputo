@@ -51,20 +51,20 @@ public class UI {
         username = scanner.next();
         System.out.println("Succesfully changed your name to: " + username);
 
-        while (getChoice) {
+        while (gotChoice) {
             System.out.println("Choose an option\n 1. Create a lobby\n 2. Join a lobby");
             try {
                 int input = scanner.nextInt();
+                getChoice = false;
                 switch(input) {
                     case 1: 
-                        getChoice = false;
                         createLobby();
                         break;
                     case 2:
-                        getChoice = false;
-                        joinLobby();
-                        break;
+                    joinLobby();
+                    break;
                     default:
+                        getChoice = true;
                         System.out.println(wrongInput);
                 }
 
@@ -102,43 +102,48 @@ public class UI {
     }
 
     public void runGame() {
-        // TODO: Surround in while loop
         // UI for the actual UNO game
-        Scanner scanner = new Scanner(System.in);
-        try {
-            Object[] message = inbox.get(new ActualField("token"), new FormalField(Object.class), new FormalField(Object.class));
-            ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
-            ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
-            
-            printHand(hand);
-            
-            System.out.println("Choose an option:\n 1. Play a card\n 2. Draw a card\n 3. Say \"UNO!\"\n 4. Object\n 5. End turn");
-            
-            int option = scanner.nextInt();
 
-            switch(option) {
-                case 1:
-                    playCard(hand, possibleCards);
-                    break;
-                case 2:
-                    drawCard();
-                    break;
-                case 3:
-                    sayUno();
-                    break;
-                case 4:
-                    object();
-                    break;
-                case 5:
-                    endTurn();
-                    break;
-                default:
-                    System.out.println(wrongInput);
+        boolean getChoice = true;
+
+        while (getChoice) {
+
+            Scanner scanner = new Scanner(System.in);
+            try {
+                Object[] message = inbox.get(new ActualField("token"), new FormalField(Object.class), new FormalField(Object.class));
+                ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
+                ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
+                
+                printHand(hand);
+                
+                System.out.println("Choose an option:\n 1. Play a card\n 2. Draw a card\n 3. Say \"UNO!\"\n 4. Object\n 5. End turn");
+                
+                int option = scanner.nextInt();
+                
+                getChoice = false;
+
+                switch(option) {
+                    case 1:
+                        playCard(hand, possibleCards);
+                        break;
+                    case 2:
+                        drawCard();
+                        break;
+                    case 3:
+                        sayUno();
+                        break;
+                    case 4:
+                        object();
+                        break;
+                    case 5:
+                        endTurn();
+                        break;
+                    default:
+                        System.out.println(wrongInput);
+                        getChoice = true;
+                        break;
             }
-
             
-
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (InputMismatchException e) {
@@ -148,28 +153,42 @@ public class UI {
         finally {
             scanner.close();
         }
-
+        
+    }
 
     }
 
     private void playCard(ArrayList<ACard> hand, ArrayList<ACard> possibleCards) {
-        // TODO: Surround in while loop
-        Scanner scanner = new Scanner(System.in);
-        try {
+        boolean getChoice = true;
+        while (getChoice) {
 
-            printHand(hand);
-            System.out.println("Choose a card to play");
-            int card = scanner.nextInt();
-            outbox.put("play", card);
+            Scanner scanner = new Scanner(System.in);
+            try {
+                printHand(hand);
+                System.out.println("Choose a card to play");
+                int card = scanner.nextInt();
+                
+                if (card > hand.size()) {
+                    System.out.println(wrongInput);
+                    continue;
+                }
+                
+                if (!possibleCards.contains(hand.get(card))) {
+                    System.out.println("That is not a valid card.");
+                    continue;
+                }
+                
+                getChoice = false;
+                outbox.put("play", card);
 
-        } catch (InputMismatchException e) {
-            System.out.println(wrongInput);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            scanner.close();
+            } catch (InputMismatchException e) {
+                System.out.println(wrongInput);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                scanner.close();
+            }
         }
-
     }
 
     private void drawCard() {
