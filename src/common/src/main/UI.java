@@ -1,9 +1,12 @@
 package common.src.main;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import org.jspace.ActualField;
+import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
@@ -11,7 +14,7 @@ import org.jspace.SpaceRepository;
 public class UI {
     
     RemoteSpace outbox;
-    SequentialSpace UIInbox;
+    SequentialSpace inbox;
     GameState state;
     String username;
 
@@ -24,8 +27,8 @@ public class UI {
         }
         
         SpaceRepository repo = new SpaceRepository();
-        UIInbox = new SequentialSpace();
-        repo.add("UIInbox", UIInbox);
+        inbox = new SequentialSpace();
+        repo.add("UIInbox", inbox);
         repo.addGate("tcp://localhost/?keep");
         try {
             outbox.put("UIInbox");
@@ -44,7 +47,7 @@ public class UI {
         System.out.println("Hello and welcome to UNO!\n");
 
         System.out.println("What is your name? ");
-        username = scanner.nextLine();
+        username = scanner.next();
         System.out.println("Succesfully changed your name to: " + username);
 
         while (getChoice) {
@@ -66,9 +69,10 @@ public class UI {
 
             } catch (InputMismatchException e) {
                 e.printStackTrace();
+            } finally {
+                scanner.close();
             }
         }
-        scanner.close();
 
     }
     
@@ -98,8 +102,98 @@ public class UI {
 
     public void runGame() {
         // UI for the actual UNO game
+        Scanner scanner = new Scanner(System.in);
+        try {
+            Object[] message = inbox.get(new ActualField("token"), new FormalField(Object.class), new FormalField(Object.class));
+            ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
+            ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
+            
+            printHand(hand);
+            
+            System.out.println("Choose an option:\n 1. Play a card\n 2. Draw a card\n 3. Say \"UNO!\"\n 4. Object\n 5. End turn");
+            
+            int option = scanner.nextInt();
+
+            switch(option) {
+                case 1:
+                    playCard(hand, possibleCards);
+                    break;
+                case 2:
+                    drawCard();
+                    break;
+                case 3:
+                    sayUno();
+                    break;
+                case 4:
+                    object();
+                    break;
+                case 5:
+                    endTurn();
+                    break;
+                default:
+                    System.out.println("Sorry that is not an option. Try again!");
+            }
+
+            
+
+
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InputMismatchException e) {
+            System.out.println("Sorry, that is not an option. Try again!");
+        }
+        
+        finally {
+            scanner.close();
+        }
+
+
     }
 
+    private void playCard(ArrayList<ACard> hand, ArrayList<ACard> possibleCards) {
+        Scanner scanner = new Scanner(System.in);
+        try {
+
+            printHand(hand);
+            System.out.println("Choose a card to play");
+            int card = scanner.nextInt();
+            outbox.put("play", card);
+
+        } catch (InputMismatchException e) {
+            System.out.println("Sorry, that is not an option. Try again!");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+
+    }
+
+    private void drawCard() {
+
+    }
+
+    private void sayUno() {
+
+    }
+
+    private void object() {
+
+    }
+
+    private void endTurn() {
+
+    }
+
+    private void printHand(ArrayList<ACard> hand) {
+        int counter = 1;
+
+        System.out.println("Your hand consist of the following cards:");
+        for (ACard card : hand) {
+            System.out.println(counter++ + ". " + hand.toString());
+        }
+    }
 
 
 }
