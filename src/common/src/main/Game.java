@@ -6,7 +6,10 @@ import org.jspace.RandomSpace;
 import org.jspace.Space;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static common.src.main.Color.*;
 
@@ -15,8 +18,14 @@ import static common.src.main.Action.*;
 
 public class Game implements IGame{
 
+    ArrayList<String> playerNames;
+
+    public Game(Collection<String> players) {
+        playerNames = new ArrayList(players);
+    }
+
     public static void main(String[] args) throws InterruptedException {
-        Game g = new Game();
+        Game g = new Game(List.of("Emma", "Mike", "John"));
         g.generateDeck();
     }
 
@@ -72,15 +81,86 @@ public class Game implements IGame{
     }
 
     @Override
-    public void startNextRound(IPlayer[] players) {
-        // TODO Auto-generated method stub
+    public void startNextRound(Map<String, IPlayerConnection> players, Space inbox) throws InterruptedException {
+        String currentPlayer = playerNames.get(0);
+        //GameState gameState = new GameState(currentPlayer, null, null, 0);
         
+        //send to all
+        for(IPlayerConnection player : players.values()){
+            // TODO insert:  player.getPlayerInbox().put("begun", currentPlayer, gameState); 
+        }
+        
+        //inbox.get(IMessage.getGeneralTemplate().getFields());
+        
+        String userName = "example";
+        players.get(userName).getPlayerInbox().put(""); //send to specific player
+
+        
+
+        // first figure out next player (what is the player order and which direction are we going)
+        // send message to all that new round has begun. (include turn token in message to new current player)
+        // send game state to all players 
+        // await turn description from current player and objections from all players
+        // if objection is raised check it and send new game state if valid
+        // update internal state to reflect player commands
     }
 
     @Override
     public boolean isObjectionCorrect() {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public boolean isGameOver() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public IPlayerConnection getWinner(Map<String, IPlayerConnection> players) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public void skip(int n){
+        for(int j = 0; j < n;j++){
+            playerNames.add(playerNames.get(playerNames.size()-1));
+            playerNames.remove(0);
+        }
+    }
+
+    public void reverse(int n){
+        if(n%2 == 1){
+            Collections.reverse(playerNames);
+        }
+    }
+
+    @Override
+    public void startGame(Map<String, IPlayerConnection> players, Space inbox) {
+        generateDeck();
+        //Put first can on discardPile
+        do {
+            try {
+                ACard[] fstCard = draw(1);
+                discardPile.push(fstCard[0]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } while(!discardPile.peek().isNumberCard());
+
+
+        //send to 7 cards to each player
+        for(IPlayerConnection player : players.values()){
+            try {
+                ACard[] hand = draw(7);
+                player.getPlayerInbox().put(hand);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
     
 }
