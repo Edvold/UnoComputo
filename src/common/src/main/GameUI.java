@@ -5,18 +5,19 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
+
+import common.src.main.GameState.PlayerState;
 
 public class GameUI{
     
     RemoteSpace outbox;
     SequentialSpace inbox;
     GameState state;
-    String username;
+    String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
 
 
@@ -43,12 +44,43 @@ public class GameUI{
         // Get message
         // If it is player's turn call takeTurn
         // otherwise call some other method
+        try {
+            while (true) {
+
+                Object[] message = inbox.get(new FormalField(GameState.class), new FormalField(Object.class), new FormalField(Object.class), new FormalField(Object.class));
+                
+                GameState gameState = (GameState) message[0];
+                ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
+                ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
+                ArrayList<PlayerAction> possibleActions = (ArrayList<PlayerAction>) message[3];
+                
+                printOverview(gameState);
+                
+                takeTurn(possibleCards, hand, possibleActions);
+            }
+
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         
     }
 
+    private void printOverview(GameState gameState) {
+        System.out.println("A new round has begun!");
+        System.out.println("The turn-order is:");
+        for (PlayerState player : gameState.turnOrder) {
+            System.out.println(player.toString());
+        }
 
-    public void takeTurn() {
-        // UI for the actual UNO game
+        System.out.println("It is currently " + gameState.currentPlayerName.userName == userName ? "your turn" : (gameState.currentPlayerName.userName + "'s turn"));
+        System.out.println("The top card is: " + gameState.topCard.toString());
+        if (gameState.streak > 0) {
+            System.out.println("There is currently a streak of " + gameState.streak);
+        }
+    }
+
+    private void takeTurn(ArrayList<ACard> possibleCards, ArrayList<ACard> hand, ArrayList<PlayerAction> possibleActions) {
 
         boolean getChoice = true;
 
@@ -56,42 +88,34 @@ public class GameUI{
 
             Scanner scanner = new Scanner(System.in);
             try {
-                Object[] message = inbox.get(new ActualField("token"), new FormalField(Object.class), new FormalField(Object.class));
-                ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
-                ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
                 
-                printHand(hand);
+                if (possibleActions.contains(PlayerAction.PLAY)) printHand(hand);
                 
-                System.out.println("Choose an option:\n 1. Play a card\n 2. Draw a card\n 3. Say \"UNO!\"\n 4. Object\n 5. End turn");
+                System.out.println("Choose an option:");
                 
+                for (int i = 1; i <= possibleActions.size(); i++) {
+                    System.out.println(i + ". " + possibleActions.get(i-1).toString());
+                }
+
                 int option = scanner.nextInt();
                 
                 getChoice = false;
 
-                switch(option) {
-                    case 1:
-                        playCard(hand, possibleCards);
-                        break;
-                    case 2:
-                        drawCard();
-                        break;
-                    case 3:
-                        sayUno();
-                        break;
-                    case 4:
-                        object();
-                        break;
-                    case 5:
-                        endTurn();
-                        break;
-                    default:
-                        System.out.println(wrongInput);
-                        getChoice = true;
-                        break;
-            }
-            
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                if (option > possibleActions.size() || option <= 0) {
+                System.out.println(wrongInput);
+                getChoice = true;
+                }
+
+                if (possibleActions.get(option-1) == PlayerAction.PLAY) {
+                    playCard(hand, possibleCards);
+                } else {
+                    try {
+                        outbox.put(possibleActions.get(option-1), -1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
         } catch (InputMismatchException e) {
             System.out.println(wrongInput);
         }
@@ -125,7 +149,7 @@ public class GameUI{
                 }
                 
                 getChoice = false;
-                outbox.put("play", card);
+                outbox.put(PlayerAction.PLAY, card);
 
             } catch (InputMismatchException e) {
                 System.out.println(wrongInput);
@@ -137,38 +161,6 @@ public class GameUI{
         }
     }
 
-    private void drawCard() {
-        try {
-            outbox.put("draw", -1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sayUno() {
-        try {
-            outbox.put("uno", -1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void object() {
-        try {
-            outbox.put("object", -1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void endTurn() {
-        try {
-            outbox.put("end", -1);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 
     private void printHand(ArrayList<ACard> hand) {
         int counter = 1;
