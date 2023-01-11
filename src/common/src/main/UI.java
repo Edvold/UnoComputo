@@ -17,6 +17,7 @@ public class UI {
     SequentialSpace inbox;
     GameState state;
     String username;
+    final static String wrongInput = "Sorry that is not an option. Try again!";
 
 
     public UI(String channel) {
@@ -64,7 +65,7 @@ public class UI {
                         joinLobby();
                         break;
                     default:
-                        System.out.println(input + "is not an available option. Try again!");
+                        System.out.println(wrongInput);
                 }
 
             } catch (InputMismatchException e) {
@@ -101,6 +102,7 @@ public class UI {
     }
 
     public void runGame() {
+        // TODO: Surround in while loop
         // UI for the actual UNO game
         Scanner scanner = new Scanner(System.in);
         try {
@@ -131,17 +133,16 @@ public class UI {
                     endTurn();
                     break;
                 default:
-                    System.out.println("Sorry that is not an option. Try again!");
+                    System.out.println(wrongInput);
             }
 
             
 
 
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (InputMismatchException e) {
-            System.out.println("Sorry, that is not an option. Try again!");
+            System.out.println(wrongInput);
         }
         
         finally {
@@ -152,6 +153,7 @@ public class UI {
     }
 
     private void playCard(ArrayList<ACard> hand, ArrayList<ACard> possibleCards) {
+        // TODO: Surround in while loop
         Scanner scanner = new Scanner(System.in);
         try {
 
@@ -161,7 +163,7 @@ public class UI {
             outbox.put("play", card);
 
         } catch (InputMismatchException e) {
-            System.out.println("Sorry, that is not an option. Try again!");
+            System.out.println(wrongInput);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -191,7 +193,7 @@ public class UI {
 
         System.out.println("Your hand consist of the following cards:");
         for (ACard card : hand) {
-            System.out.println(counter++ + ". " + hand.toString());
+            System.out.println(counter++ + ". " + card.toString());
         }
     }
 
