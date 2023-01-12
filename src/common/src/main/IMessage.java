@@ -49,6 +49,11 @@ public interface IMessage {
          */
         public IMessageTemplateBuilder addActualType();
         /**
+         * Find messages of some type different from the one building this template.
+         * @return this instance
+         */
+        public IMessageTemplateBuilder addActualType(MessageType type);
+        /**
          * Templates for the specific value provided
          * @param message The message to search for
          * @return this instance

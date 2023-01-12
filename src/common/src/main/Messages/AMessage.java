@@ -30,12 +30,27 @@ public abstract class AMessage implements IMessage {
     public String getMessageText() {
         return actualMessage.getMessageText();
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("(")
+            .append(getMessageType())
+            .append(", ")
+            .append(getMessageText())
+            .append(")")
+            .toString();
+    }
     
     private final static class Unit {
         private static Unit instance;
     
         private Unit() { }
-    
+        
+        @Override
+        public String toString() {
+            return "Unit";
+        }
+        
         public static Unit getInstance() {
             if (instance == null) {
                 instance = new Unit();
