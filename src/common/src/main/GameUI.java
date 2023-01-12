@@ -12,28 +12,33 @@ import org.jspace.SpaceRepository;
 
 import common.src.main.GameState.PlayerState;
 
-public class GameUI{
+
+public class GameUI implements Runnable{
     
     RemoteSpace outbox;
     SequentialSpace inbox;
+    final static String inboxName = "UIInbox";
     GameState state;
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
 
 
-    public GameUI(String channel) {
+    public GameUI(String channel, String userName) {
+
+        this.userName = userName;
+
         try {
-            outbox = new RemoteSpace("tcp://localhost/" + channel + "?keep");
+            outbox = new RemoteSpace("tcp://localhost:9001/" + channel + "?keep");
         } catch (IOException e) {
             e.printStackTrace();
         }
         
         SpaceRepository repo = new SpaceRepository();
         inbox = new SequentialSpace();
-        repo.add("UIInbox", inbox);
+        repo.add(inboxName, inbox);
         repo.addGate("tcp://localhost/?keep");
         try {
-            outbox.put("UIInbox");
+            outbox.put(inboxName);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -44,11 +49,14 @@ public class GameUI{
         // Get message
         // If it is player's turn call takeTurn
         // otherwise call some other method
+        
         try {
-            while (true) {
 
+            while (true) {
                 Object[] message = inbox.get(new FormalField(GameState.class), new FormalField(Object.class), new FormalField(Object.class), new FormalField(Object.class));
+                System.out.println("Got message!");
                 
+
                 GameState gameState = (GameState) message[0];
                 ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
                 ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
