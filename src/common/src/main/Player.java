@@ -35,55 +35,61 @@ public class Player implements IPlayer {
         }
 
     public void run() throws InterruptedException {
-        NextPlayerCommand turnMessage = (NextPlayerCommand) gameSpace.get(new FormalField(NextPlayerCommand.class))[0];
-        this.gameState = ((NewGameStateMessage) gameSpace.get(new FormalField(NewGameStateMessage.class))[0]).getState();
-        if (turnMessage.getState().equals("turnToken")) {
+        String token = "";
+        while (true) {
+            NextPlayerCommand turnMessage = (NextPlayerCommand) gameSpace.get(new FormalField(NextPlayerCommand.class))[0];
+            this.gameState = ((NewGameStateMessage) gameSpace.get(new FormalField(NewGameStateMessage.class))[0]).getState();
+            token = turnMessage.getState();
+            if (token.equals("turnToken")) {
             // It is your turn
-            PlayerAction[] actions = {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
-            while (true) {
-                UISpace.put(gameState, getPlayableCards(hand, gameState.topCard), hand, actions); //message?
-                IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
-                if(newMessage.getMessageType() == MessageType.CallOutCommand){
-                    CallOutCommand message = (CallOutCommand) newMessage;
-                    //This should probably be a message
-                    UISpace.put("There has been an objection by " + message.getMessageText());
-                }
-                else if (newMessage.getMessageType() == MessageType.Update){
-                    UpdateMessage message = (UpdateMessage) newMessage;
-                    //This should probably be a message
-                    UISpace.put(message.getMessageText());
-                }
-                else if (newMessage.getMessageType() == MessageType.UIMessage){
-                    UIMessage message = (UIMessage) newMessage;
-                    //This should probably be a message
-                    String action = message.getMessageText();
-                    switch (action) {
-                        case "Draw": gameSpace.put(new DrawCardsCommand("Draw"));
-                                     return;
-                        case "End":  gameSpace.put(new PlayCardsCommand(saidUNO, output));
-                                     return;
-                        case "UNO":  saidUNO = true;
-                                     break;
-                        case "Object": gameSpace.put(new CallOutCommand(playerName));
-                                       break;
-                        case "Play": addToOutput(message.getState());
-                                     hand.remove(message.getState());
-                                     actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.UNO,PlayerAction.OBJECT,PlayerAction.ENDTURN};
-                                     break;
+                PlayerAction[] actions = {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
+                while (token.equals("turnToken")) {
+                    UISpace.put(gameState, getPlayableCards(hand, gameState.topCard), hand, actions); //message?
+                    IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
+                    if(newMessage.getMessageType() == MessageType.CallOutCommand){
+                        CallOutCommand message = (CallOutCommand) newMessage;
+                        //This should probably be a message
+                        UISpace.put("There has been an objection by " + message.getMessageText());
+                    }
+                    else if (newMessage.getMessageType() == MessageType.Update){
+                        UpdateMessage message = (UpdateMessage) newMessage;
+                        //This should probably be a message
+                        UISpace.put(message.getMessageText());
+                    }
+                    else if (newMessage.getMessageType() == MessageType.UIMessage){
+                        UIMessage message = (UIMessage) newMessage;
+                        //This should probably be a message
+                        String action = message.getMessageText();
+                        switch (action) {
+                            case "Draw": gameSpace.put(new DrawCardsCommand("Draw"));
+                                    token = "";
+                                    return;
+                            case "End":  gameSpace.put(new PlayCardsCommand(saidUNO, output));
+                                    token = "";
+                                    return;
+                            case "UNO":  saidUNO = true;
+                                    break;
+                            case "Object": gameSpace.put(new CallOutCommand(playerName));
+                                    break;
+                            case "Play": addToOutput(message.getState());
+                                    hand.remove(message.getState());
+                                    actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.UNO,PlayerAction.OBJECT,PlayerAction.ENDTURN};
+                                    break;
                     }
                 }
             }
         }
-        else {
-            PlayerAction[] actions = {PlayerAction.OBJECT};
-            // It is not your turn
-            if(!callOutCheckerThread.isAlive()){
-                callOutCheckerThread.start();
-            }
-            UISpace.put(gameState, new ArrayList<ACard>(), hand, actions);
-            //Objection message to player
-            //should the entire run method be in a while (true) loop, and then we just check for
-            //update messages and NextPlayerCommand messages?
+            else {
+                PlayerAction[] actions = {PlayerAction.OBJECT};
+                // It is not your turn
+                if(!callOutCheckerThread.isAlive()){
+                    callOutCheckerThread.start();
+                }
+                UISpace.put(gameState, new ArrayList<ACard>(), hand, actions);
+                //Objection message to player
+                //should the entire run method be in a while (true) loop, and then we just check for
+                //update messages and NextPlayerCommand messages?
+        }
         }
     }
         
@@ -108,6 +114,7 @@ public class Player implements IPlayer {
     @Override
     public String computeReturnToken(String ID) {
         return  ID.equals("object") ? "null" : "TurnToken";
+        //This method is not needed
     }
 
     //getters and setters
