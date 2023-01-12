@@ -29,4 +29,6 @@ public enum MessageType {
      */
     Update,
     NewGameState,
+    InputRequest,
+    InputResponse,
 }
