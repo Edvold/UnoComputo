@@ -5,9 +5,9 @@ public class GameState {
     final public PlayerState currentPlayerName;
     final public ACard topCard;
     final public PlayerState[] turnOrder; //players in order of their turns (not containing current)
-    final public byte streak;
+    final public int streak;
     
-    public GameState (PlayerState currentPlayerName, ACard topCard, PlayerState[] turnOrder, byte streak){
+    public GameState (PlayerState currentPlayerName, ACard topCard, PlayerState[] turnOrder, int streak){
         this.currentPlayerName = currentPlayerName;
         this.topCard = topCard;
         this.turnOrder = turnOrder;
