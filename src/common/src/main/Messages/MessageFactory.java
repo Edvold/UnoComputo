@@ -21,7 +21,7 @@ public class MessageFactory {
             case NewGameState -> new NewGameStateMessage((GameState)fields[1], (String) fields[2]); 
             case InputRequest -> new InputRequest((IMessage)fields[1], (String) fields[2]); 
             case InputResponse -> new InputResponse((String) fields[1],(String) fields[2]);  
-            case StartGame -> new GenericMessage(StartGame, (String) fields[2]) 
+            case StartGame -> new GenericMessage(StartGame, (String) fields[2]);
             case UIMessage -> new UIMessage((ACard)fields[1], (String) fields[2]); 
             case GameOver -> new GenericMessage(GameOver, (String) fields[2]); 
             default -> AStateMessage.fromResponse(fields);

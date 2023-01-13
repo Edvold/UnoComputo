@@ -11,6 +11,7 @@ import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.NewGameStateMessage;
 import common.src.main.Messages.NextPlayerCommand;
 import common.src.main.Messages.PlayCardsCommand;
+import common.src.main.Messages.PlayerMessage;
 import common.src.main.Messages.UIMessage;
 import common.src.main.Messages.UpdateMessage;
 
@@ -45,17 +46,17 @@ public class Player implements IPlayer {
             // It is your turn
                 PlayerAction[] actions = {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
                 while (token.equals("turnToken")) {
-                    UISpace.put(gameState, getPlayableCards(hand, gameState.topCard), hand, actions); //message?
+                    UISpace.put(new PlayerMessage(gameState, (Card[]) getPlayableCards(hand, gameState.topCard).toArray(), (Card[]) hand.toArray(), actions)); //message?
                     IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
                     if(newMessage.getMessageType() == MessageType.CallOutCommand){
                         CallOutCommand message = (CallOutCommand) newMessage;
                         //This should probably be a message
-                        UISpace.put("There has been an objection by " + message.getMessageText());
+                        UISpace.put(new UpdateMessage("There has been an objection by " + message.getMessageText()));
                     }
                     else if (newMessage.getMessageType() == MessageType.Update){
                         UpdateMessage message = (UpdateMessage) newMessage;
                         //This should probably be a message
-                        UISpace.put(message.getMessageText());
+                        UISpace.put(message);
                     }
                     else if (newMessage.getMessageType() == MessageType.UIMessage){
                         UIMessage message = (UIMessage) newMessage;
@@ -86,7 +87,7 @@ public class Player implements IPlayer {
                 if(!callOutCheckerThread.isAlive()){
                     callOutCheckerThread.start();
                 }
-                UISpace.put(gameState, new ArrayList<ACard>(), hand, actions);
+                UISpace.put(new PlayerMessage(gameState, new Card[0], (Card[]) hand.toArray(), actions));
                 //Objection message to player
                 //should the entire run method be in a while (true) loop, and then we just check for
                 //update messages and NextPlayerCommand messages?
