@@ -10,4 +10,5 @@ public interface IPlayer {
 
     String computeReturnToken(String ID); //can maybe be omitted
     
+    void run() throws InterruptedException;
 }

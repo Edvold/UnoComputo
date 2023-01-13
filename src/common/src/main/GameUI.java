@@ -1,48 +1,27 @@
 package common.src.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import org.jspace.FormalField;
-import org.jspace.RemoteSpace;
-import org.jspace.SequentialSpace;
-import org.jspace.SpaceRepository;
-
+import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
 
 
 public class GameUI implements Runnable{
     
-    RemoteSpace outbox;
-    SequentialSpace inbox;
+    Space outbox;
+    Space inbox;
     final static String inboxName = "UIInbox";
     GameState state;
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
 
 
-    public GameUI(String channel, String userName) {
-
-        this.userName = userName;
-
-        try {
-            outbox = new RemoteSpace("tcp://localhost:9001/" + channel + "?keep");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        SpaceRepository repo = new SpaceRepository();
-        inbox = new SequentialSpace();
-        repo.add(inboxName, inbox);
-        repo.addGate("tcp://localhost/?keep");
-        try {
-            outbox.put(inboxName);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+    public GameUI(Space inbox, Space outbox) {
+        this.inbox = inbox;
+        this.outbox = outbox;
     }
 
     public void run() {
