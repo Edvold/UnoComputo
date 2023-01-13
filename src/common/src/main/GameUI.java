@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
