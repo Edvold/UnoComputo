@@ -1,6 +1,5 @@
 package common.src.main;
 
-import java.util.Map;
 import java.util.Stack;
 
 import org.jspace.RandomSpace;
@@ -8,10 +7,10 @@ import org.jspace.Space;
 
 interface IGame {
 
-    RandomSpace deck = new RandomSpace();
+    Space deck = new RandomSpace();
     Stack<ACard> discardPile = new Stack<>();
 
-    void startGame(Map<String, IPlayerConnection> players, Space inbox);
+    void startGame();
     void generateDeck();
     
     /**
@@ -19,13 +18,8 @@ interface IGame {
      * Not used outside of game
      */
     void shuffleDeck();
-    ACard[] draw(int amount) throws InterruptedException; // not useful outside of game
-    void startNextRound(Map<String, IPlayerConnection> players, Space inbox) throws InterruptedException; // Needs to take into account skipping & reversing
+    void startNextRound() throws InterruptedException;
     boolean isGameOver();
-    IPlayerConnection getWinner(Map<String, IPlayerConnection> players);
-    boolean isObjectionCorrect(); // not useful outside of game
-    
-
-    
-
+    String getWinner();
+    void endGame(String winner);
 }

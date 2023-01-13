@@ -7,11 +7,16 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.jspace.RemoteSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
 
+import common.src.main.Messages.GenericMessage;
 import common.src.main.Messages.UpdateMessage;
 
 public final class Host implements Runnable {
@@ -22,6 +27,7 @@ public final class Host implements Runnable {
     private SpaceRepository repository;
     private LobbyUI ui = LobbyUI.getInstance();
     private Map<String, Space> playerSpaces = new HashMap<String, Space>(8);
+    private boolean hasGameStarted = false;
 
     public Host(SpaceRepository repository, Space lobby) {
         this.repository = repository;
@@ -83,16 +89,6 @@ public final class Host implements Runnable {
                         ui.showMessage("Game cannot start with less than 2 players");
                         continue;
                     }
-
-                    var update = new UpdateMessage("Game is starting now!");
-                    playerSpaces.forEach((n, outbox) -> {
-                        try {
-                            outbox.put(update.getFields());
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    });
                     break;
                 } else {
                     ui.showMessage("Unknown request type: " + Arrays.toString(request) 
@@ -107,10 +103,32 @@ public final class Host implements Runnable {
                 e.printStackTrace();
             }
         }
+
+        
     
         // TODO start game.
         // - Game is managed by controler that starts thread and manages the game
         // progressing
+        var startGameMessage = new GenericMessage(MessageType.StartGame, "Game is starting now!");
+        playerSpaces.forEach((n, outbox) -> {
+            try {
+                outbox.put(startGameMessage.getFields());
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+        hasGameStarted = true;
+
+        var playerConections = new HashMap<String, IPlayerConnection>(playerSpaces.size());
+        for (var entry : playerSpaces.entrySet()) {
+            var connection = new PlayerConnection(entry.getKey(), entry.getValue());
+            playerConections.put(entry.getKey(), connection);
+        }
+
+        IGame game = new Game(playerConections, lobbySpace);
+        var gameController = new GameController(game);
+        gameController.start();
     }
     private void setupGate() {
         try {
@@ -166,7 +184,7 @@ public final class Host implements Runnable {
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-                while(true) {
+                while(!hasGameStarted) {
                     try {
                         var text = ui.getInput("> ");
                         if (text.equalsIgnoreCase("start")) {
@@ -181,8 +199,27 @@ public final class Host implements Runnable {
             
         };
 
-        var t = new Thread(runnable);
-        t.setDaemon(true);
-        t.start();
+        new Thread(runnable).start();
+    }
+
+    private static class PlayerConnection implements IPlayerConnection {
+        private final String name;
+        private final Space inbox;
+
+        PlayerConnection(String name, Space inbox) {
+            this.name = name; 
+            this.inbox = inbox; 
+        }
+
+        @Override
+        public String getPlayerName() {
+            return name;
+        }
+
+        @Override
+        public Space getPlayerInbox() {
+            return inbox;
+        }
+
     }
 }
