@@ -30,4 +30,5 @@ public enum MessageType {
     Update,
     NewGameState,
     UIMessage,
+    PlayerMessage,
 }

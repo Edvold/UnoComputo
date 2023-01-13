@@ -8,7 +8,11 @@ public class Card extends ACard {
     private Color color;
     private Action action;
 
-    Card(Color c, Action a){
+    public Card() {
+
+    }
+
+    public Card(Color c, Action a){
         this.color = c;
         this.action = a;
     }
