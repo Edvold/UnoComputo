@@ -1,32 +1,29 @@
 package common.src.main;
 
-import org.jspace.ActualField;
-import org.jspace.FormalField;
-import org.jspace.RandomSpace;
-import org.jspace.Space;
+import static common.src.main.Action.WILD;
+import static common.src.main.Action.WILDDRAW4;
+import static common.src.main.Action.ZERO;
+import static common.src.main.Color.BLACK;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-import static common.src.main.Color.*;
+import org.jspace.FormalField;
+import org.jspace.Space;
 
+import common.src.main.Messages.GenericMessage;
 
-import static common.src.main.Action.*;
+public class Game implements IGame {
 
-public class Game implements IGame{
+    private Map<String, IPlayerConnection> players;
+    private Space inbox;
+    private ArrayList<String> playerNames;
 
-    ArrayList<String> playerNames;
-
-    public Game(Collection<String> players) {
-        playerNames = new ArrayList(players);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Game g = new Game(List.of("Emma", "Mike", "John"));
-        g.generateDeck();
+    public Game(Map<String, IPlayerConnection> players, Space inbox) {
+        this.players = players;
+        this.inbox = inbox;
+        playerNames = new ArrayList(players.keySet());
     }
 
     @Override
@@ -68,7 +65,6 @@ public class Game implements IGame{
         discardPile.push(topCard);     
     }
 
-    @Override
     public ACard[] draw(int amount) throws InterruptedException {
         if(amount > deck.size()){
             shuffleDeck();
@@ -81,7 +77,7 @@ public class Game implements IGame{
     }
 
     @Override
-    public void startNextRound(Map<String, IPlayerConnection> players, Space inbox) throws InterruptedException {
+    public void startNextRound() throws InterruptedException {
         String currentPlayer = playerNames.get(0);
         players.get(currentPlayer).getPlayerInbox().put("turnToken");
 
@@ -110,7 +106,6 @@ public class Game implements IGame{
         // update internal state to reflect player commands
     }
 
-    @Override
     public boolean isObjectionCorrect() {
         // TODO Auto-generated method stub
         return false;
@@ -123,7 +118,7 @@ public class Game implements IGame{
     }
 
     @Override
-    public IPlayerConnection getWinner(Map<String, IPlayerConnection> players) {
+    public String getWinner() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -143,7 +138,7 @@ public class Game implements IGame{
     }
 
     @Override
-    public void startGame(Map<String, IPlayerConnection> players, Space inbox) {
+    public void startGame() {
         generateDeck();
         //Put first can on discardPile
         do {
@@ -168,4 +163,21 @@ public class Game implements IGame{
 
     }
     
+    @Override
+    public void endGame(String winner) {
+        for (var p : players.values()) {
+            IMessage message;
+            if (p.getPlayerName().equalsIgnoreCase(winner)) {
+                message = new GenericMessage(MessageType.GameOver, "Congratulations! You Won!");
+            } else {
+                message = new GenericMessage(MessageType.GameOver, "Game Over, " + winner + " has won the game...");
+            }
+
+            try {
+                p.getPlayerInbox().put(message.getFields());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
