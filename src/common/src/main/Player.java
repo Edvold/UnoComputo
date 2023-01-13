@@ -50,25 +50,22 @@ public class Player implements IPlayer {
                     IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
                     if(newMessage.getMessageType() == MessageType.CallOutCommand){
                         CallOutCommand message = (CallOutCommand) newMessage;
-                        //This should probably be a message
                         UISpace.put(new UpdateMessage("There has been an objection by " + message.getMessageText()));
                     }
                     else if (newMessage.getMessageType() == MessageType.Update){
                         UpdateMessage message = (UpdateMessage) newMessage;
-                        //This should probably be a message
                         UISpace.put(message);
                     }
                     else if (newMessage.getMessageType() == MessageType.UIMessage){
                         UIMessage message = (UIMessage) newMessage;
-                        //This should probably be a message
                         String action = message.getMessageText();
                         switch (action) {
                             case "Draw": gameSpace.put(new DrawCardsCommand("Draw"));
                                     token = "";
-                                    return;
+                                    break;
                             case "End":  gameSpace.put(new PlayCardsCommand(saidUNO, output));
                                     token = "";
-                                    return;
+                                    break;
                             case "UNO":  saidUNO = true;
                                     break;
                             case "Object": gameSpace.put(new CallOutCommand(playerName));
@@ -88,9 +85,6 @@ public class Player implements IPlayer {
                     callOutCheckerThread.start();
                 }
                 UISpace.put(new PlayerMessage(gameState, new Card[0], (Card[]) hand.toArray(), actions));
-                //Objection message to player
-                //should the entire run method be in a while (true) loop, and then we just check for
-                //update messages and NextPlayerCommand messages?
         }
         }
     }
