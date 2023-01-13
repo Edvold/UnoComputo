@@ -35,5 +35,13 @@ public abstract class ACard implements Comparable<ACard> {
 		String action = this.getAction().toString().toLowerCase();
 		return color + " " + action;
 	}
+
+	public boolean isNumberCard() {
+		return switch (getAction()) {
+			case ZERO,ONE,TWO,THREE,FOUR,FIVE,SIX,SEVEN,EIGHT,NINE -> true;
+			//case DRAW2,REVERSE,SKIP,
+			default -> false;
+		};
+	}
 }
 

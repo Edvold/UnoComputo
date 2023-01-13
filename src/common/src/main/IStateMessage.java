@@ -1,6 +1,5 @@
 package common.src.main;
 
-import org.jspace.FormalField;
 import org.jspace.Template;
 
 /**
