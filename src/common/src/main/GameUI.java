@@ -37,7 +37,7 @@ public class GameUI implements Runnable{
             while (true) {
 
                 var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
-                GameStateUpdate gsu = (GameStateUpdate)((IStateMessage) MessageFactory.create(message)).getState();
+                GameStateUpdate gsu = (GameStateUpdate)((IStateMessage<GameStateUpdate>) MessageFactory.create(message)).getState();
                 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
                 ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
