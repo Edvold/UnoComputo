@@ -12,6 +12,7 @@ import java.util.Map;
 import org.jspace.FormalField;
 import org.jspace.Space;
 
+import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
 
 public class Game implements IGame {
@@ -155,7 +156,7 @@ public class Game implements IGame {
         for(IPlayerConnection player : players.values()){
             try {
                 ACard[] hand = draw(7);
-                player.getPlayerInbox().put(hand);
+                player.getPlayerInbox().put(new DrawCardsCommand(hand, "Getting Starting Hand"));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
