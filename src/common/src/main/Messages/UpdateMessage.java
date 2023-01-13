@@ -11,4 +11,8 @@ public class UpdateMessage extends AMessage {
         super(Update, message);
     }
     
+    @Override
+    public String toString() {
+        return this.getMessageText();
+    }
 }

@@ -15,14 +15,16 @@ import common.src.main.Messages.UpdateMessage;
 public class LobbyUI {
     private static LobbyUI instance;
     private final Space inbox;
+    private final Space outbox;
     private final BufferedReader input;
 
     private LobbyUI() {
         inbox = new SequentialSpace();
+        outbox = new SequentialSpace();
         input = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public static LobbyUI getInstance() {
+    public static synchronized LobbyUI getInstance() {
         if (instance == null) {
             instance = new LobbyUI();
         }
@@ -46,7 +48,7 @@ public class LobbyUI {
     public String getInput(IMessage message) throws InterruptedException {
         final var inputReq =  new InputRequest(message);
         inbox.put(inputReq.getFields());
-        var response = inputReq.waitForResponse(inbox);
+        var response = inputReq.waitForResponse(outbox);
         return response;
     }
 
@@ -55,12 +57,14 @@ public class LobbyUI {
         while (true) {
             try {
                 var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
-
-                if ((MessageType)message[0] == MessageType.InputRequest) {
-                    System.out.println(message[1].toString());
+                var type = (MessageType)message[0];
+                if (type == MessageType.InputRequest) {
+                    System.out.println(message[1].toString()); 
                     var response = input.readLine();
                     var output = new InputResponse(response, message);
-                    inbox.put(output.getFields());
+                    outbox.put(output.getFields());
+                } else if (type == MessageType.Update) {
+                    System.out.println(message[2]);
                 } else {
                     System.out.println(Arrays.toString(message));
                 }

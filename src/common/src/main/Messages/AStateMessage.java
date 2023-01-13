@@ -35,7 +35,7 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
     }
 
     public IStateMessageTemplateBuilder<T> getTemplateBuilder() {
-        return new MessageTemplateBuilder(type, stateType);
+        return new MessageTemplateBuilder(type, stateType != null ? stateType : Object.class);
     }
 
     public Object[] getFields() {
