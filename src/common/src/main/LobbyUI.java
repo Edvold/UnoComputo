@@ -17,11 +17,13 @@ public class LobbyUI {
     private final Space inbox;
     private final Space outbox;
     private final BufferedReader input;
+    private boolean isRunning;
 
     private LobbyUI() {
         inbox = new SequentialSpace();
         outbox = new SequentialSpace();
         input = new BufferedReader(new InputStreamReader(System.in));
+        isRunning = false;
     }
 
     public static synchronized LobbyUI getInstance() {
@@ -54,7 +56,8 @@ public class LobbyUI {
 
     public void start() {
         System.out.println("Ui Started");
-        while (true) {
+        isRunning = true;
+        while (isRunning) {
             try {
                 var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
                 var type = (MessageType)message[0];
@@ -73,5 +76,15 @@ public class LobbyUI {
                 e.printStackTrace();
             }
         }
+        try {
+            input.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void stop() {
+        isRunning = false;
     }
 }
