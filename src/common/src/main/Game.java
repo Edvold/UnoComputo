@@ -57,6 +57,7 @@ public class Game implements IGame {
         try
         {
             for(ACard c : discardPile){
+                c.resetWildCard();
                 deck.put(new Card(c.getColor(), c.getAction()));
             }
         } catch (Exception e){
