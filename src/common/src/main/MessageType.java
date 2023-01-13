@@ -31,4 +31,6 @@ public enum MessageType {
     NewGameState,
     InputRequest,
     InputResponse,
+    JoinGameRequest, 
+    StartGame,
 }
