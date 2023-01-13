@@ -3,13 +3,11 @@ package common.src.main;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
@@ -32,8 +30,8 @@ public final class Host implements Runnable {
 
     @Override
     public void run() {
-        setupGate();
         addHostAsPlayer();
+        setupGate();
         hostGame();
     }
 
@@ -153,7 +151,7 @@ public final class Host implements Runnable {
     }
 
     private static URI ipToURI(String ipString) {
-        var uri = URI.create("tcp://" + ipString +":9001/?keep");
+        var uri = URI.create("tcp://" + ipString +":" + HOST_PORT + "/?keep");
         return uri;
     }
 
