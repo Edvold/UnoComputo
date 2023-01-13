@@ -25,6 +25,6 @@ public class MessageFactory {
             case UIMessage -> new UIMessage((ACard)fields[1], (String) fields[2]); 
             case GameOver -> new GenericMessage(GameOver, (String) fields[2]); 
             default -> AStateMessage.fromResponse(fields);
-        }
+        };
     }
 }
