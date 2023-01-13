@@ -34,6 +34,16 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
         message = (String) fields[2];
     }
 
+    public static AStateMessage<Object> fromResponse(Object[] fields) {
+        return new AStateMessage<Object>(fields) {
+            @Override
+            public String toString() {
+                var stateMsg = state != null ? state.toString() : "";
+                return type + ": " + message + "\n\t" + stateMsg;
+            }
+        };
+    }
+
     public IStateMessageTemplateBuilder<T> getTemplateBuilder() {
         return new MessageTemplateBuilder(type, stateType != null ? stateType : Object.class);
     }
