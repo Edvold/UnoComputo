@@ -7,11 +7,13 @@ import static common.src.main.Color.BLACK;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jspace.FormalField;
 import org.jspace.Space;
 
+import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
 
 public class Game implements IGame {
@@ -19,11 +21,14 @@ public class Game implements IGame {
     private Map<String, IPlayerConnection> players;
     private Space inbox;
     private ArrayList<String> playerNames;
+    private Map<String, Integer> playersHandSize;
+
 
     public Game(Map<String, IPlayerConnection> players, Space inbox) {
         this.players = players;
         this.inbox = inbox;
         playerNames = new ArrayList(players.keySet());
+        playersHandSize = new HashMap(players.size());
     }
 
     @Override
@@ -57,6 +62,7 @@ public class Game implements IGame {
         try
         {
             for(ACard c : discardPile){
+                c.resetWildCard();
                 deck.put(new Card(c.getColor(), c.getAction()));
             }
         } catch (Exception e){
@@ -113,7 +119,11 @@ public class Game implements IGame {
 
     @Override
     public boolean isGameOver() {
-        // TODO Auto-generated method stub
+        for(int val : playersHandSize.values()){
+            if(val == 0){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -155,7 +165,7 @@ public class Game implements IGame {
         for(IPlayerConnection player : players.values()){
             try {
                 ACard[] hand = draw(7);
-                player.getPlayerInbox().put(hand);
+                player.getPlayerInbox().put(new DrawCardsCommand(hand, "Getting Starting Hand"));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

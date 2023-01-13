@@ -1,13 +1,16 @@
 package common.src.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.Space;
 
+import common.src.main.Messages.AStateMessage;
 import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
+import common.src.main.Messages.MessageFactory;
 import common.src.main.Messages.NewGameStateMessage;
 import common.src.main.Messages.NextPlayerCommand;
 import common.src.main.Messages.PlayCardsCommand;
@@ -37,6 +40,8 @@ public class Player implements IPlayer {
 
     @Override
     public void run() throws InterruptedException {
+        getDrawnCards(); // get initial hand
+
         String token = "";
         while (true) {
             NextPlayerCommand turnMessage = (NextPlayerCommand) gameSpace.get(new FormalField(NextPlayerCommand.class))[0];
@@ -61,6 +66,7 @@ public class Player implements IPlayer {
                         PlayerAction action = message.getState();
                         switch (action) {
                             case DRAW: gameSpace.put(new DrawCardsCommand("Draw"));
+                                getDrawnCards();
                                     token = "";
                                     break;
                             case ENDTURN:  gameSpace.put(new PlayCardsCommand(saidUNO, output));
@@ -130,6 +136,17 @@ public class Player implements IPlayer {
     //     this.gameState = gameState;
     // }    
 
+    private void getDrawnCards() throws InterruptedException {
+        var template = new DrawCardsCommand().getTemplateBuilder()
+            .addActualType()
+            .build();
+        var response = playerInbox.get(template.getFields());
+        var message = (DrawCardsCommand) MessageFactory.create(response);
+
+        var newCards = Arrays.asList(message.getState());
+
+        this.hand.addAll(newCards);
+    } 
     
 }
 
