@@ -1,27 +1,32 @@
 package common.src.main;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
-import common.src.main.Messages.PlayerMessage;
+import common.src.main.Messages.MessageFactory;
 
 
 public class GameUI implements Runnable{
     
     Space outbox;
     Space inbox;
-    final static String inboxName = "UIInbox";
-    GameState state;
+    GameState gameState;
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
+    BufferedReader reader = new BufferedReader((new InputStreamReader(System.in)));
 
 
-    public GameUI(Space inbox, Space outbox) {
+    public GameUI(Space inbox, Space outbox, String name) {
         this.inbox = inbox;
         this.outbox = outbox;
+        userName = name;
     }
 
     public void run() {
@@ -32,26 +37,18 @@ public class GameUI implements Runnable{
         try {
 
             while (true) {
-                //var m  = new PlayerMessage(null, null, null, null).getTemplateBuilder()
-                //.addActualType().build();
-                Object message = (inbox.get(IMessage.getGeneralTemplate().getFields()))[1];
-                
-                assert true;
-                //ArrayList<ACard> possibleCards = new ArrayList<ACard>(Arrays.asList(message.possibleCards));
-                //ArrayList<ACard> hand =  new ArrayList<ACard>(Arrays.asList(message.hand));
-                //ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(message.possibleActions));
 
-                // ArrayList<String> possibleStringActions = (ArrayList<String>) message[3];
+                var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
+                GameStateUpdate gsu = (GameStateUpdate)((IStateMessage) MessageFactory.create(message)).getState();
                 
-                // ArrayList<PlayerAction> possibleActions = new ArrayList<>();
-                
-                // for (String playerAction : possibleStringActions) {
-                //     possibleActions.add(PlayerAction.valueOf(playerAction));
-                // }
+                ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
+                ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
+                ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(gsu.possibleActions));
+                gameState = gsu.gameState;
 
-                //printOverview(message.gameState);
-                //
-                //takeTurn(possibleCards, hand, possibleActions);
+                printOverview(gameState);
+                
+                takeTurn(possibleCards, hand, possibleActions);
             }
 
 
@@ -68,20 +65,19 @@ public class GameUI implements Runnable{
             System.out.println(player.toString());
         }
 
-        System.out.println("It is currently " + (gameState.currentPlayerName.userName == userName ? "your turn" : (gameState.currentPlayerName.userName + "'s turn")));
-        System.out.println("The top card is: " + gameState.topCard.toString());
+        System.out.println("It is currently " + (gameState.currentPlayerName.userName.equals(userName) ? "your turn" : (gameState.currentPlayerName.userName + "'s turn")));
+        printTopCard();
         if (gameState.streak > 0) {
             System.out.println("There is currently a streak of " + gameState.streak);
         }
     }
 
-    private void takeTurn(ArrayList<ACard> possibleCards, ArrayList<ACard> hand, ArrayList<PlayerAction> possibleActions) {
+    private void takeTurn(ArrayList<Card> possibleCards, ArrayList<Card> hand, ArrayList<PlayerAction> possibleActions) {
 
         boolean getChoice = true;
 
         while (getChoice) {
 
-            Scanner scanner = new Scanner(System.in);
             try {
                 
                 if (possibleActions.contains(PlayerAction.PLAY)) printHand(hand);
@@ -93,7 +89,7 @@ public class GameUI implements Runnable{
                     System.out.println(i + ". " + pa.toString());
                 }
 
-                int option = scanner.nextInt();
+                int option = Integer.parseInt(reader.readLine());
                 
                 getChoice = false;
 
@@ -102,6 +98,7 @@ public class GameUI implements Runnable{
                 getChoice = true;
                 }
 
+                clearScreen();
                 if (possibleActions.get(option-1) == PlayerAction.PLAY) {
                     playCard(hand, possibleCards);
                 } else {
@@ -112,59 +109,69 @@ public class GameUI implements Runnable{
                     }
                 }
 
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
+                clearScreen();
                 System.out.println(wrongInput);
-            }
-            
-            finally {
-                scanner.close();
-            }
-        
+            } catch (IOException e) {
+                e.printStackTrace();
+            }        
     }
 
     }
 
-    private void playCard(ArrayList<ACard> hand, ArrayList<ACard> possibleCards) {
+    private void playCard(ArrayList<Card> hand, ArrayList<Card> possibleCards) {
         boolean getChoice = true;
         while (getChoice) {
 
-            Scanner scanner = new Scanner(System.in);
             try {
                 printHand(hand);
+                printTopCard();
                 System.out.println("Choose a card to play");
-                int card = scanner.nextInt();
+                int card = Integer.parseInt(reader.readLine())-1;
                 
-                if (card > hand.size()) {
+                if (card >= hand.size()) {
+                    clearScreen();
                     System.out.println(wrongInput);
                     continue;
                 }
                 
                 if (!possibleCards.contains(hand.get(card))) {
+                    clearScreen();
                     System.out.println("That is not a valid card.");
                     continue;
                 }
                 
+                clearScreen();
                 getChoice = false;
                 outbox.put(PlayerAction.PLAY, card);
-
-            } catch (InputMismatchException e) {
-                System.out.println(wrongInput);
+                
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } finally {
-                scanner.close();
+            } catch (NumberFormatException e) {
+                clearScreen();
+                System.out.println(wrongInput);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
 
-    private void printHand(ArrayList<ACard> hand) {
+    private void printHand(ArrayList<Card> hand) {
         int counter = 1;
 
         System.out.println("Your hand consist of the following cards:");
         for (ACard card : hand) {
             System.out.println(counter++ + ". " + card.toString());
         }
+    }
+
+    private void printTopCard() {
+        System.out.println("The top card is: " + gameState.topCard);
+    }
+
+    private void clearScreen() {
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
 
 }

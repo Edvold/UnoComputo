@@ -95,7 +95,7 @@ public class Client implements Runnable {
         ui.stop();
 
         Space uiSpace = new SequentialSpace();
-        new Thread(new GameUI(uiSpace, playerInbox)).start();
+        new Thread(new GameUI(uiSpace, playerInbox, name)).start();
         
         IPlayer player = new Player(name, lobbySpace, uiSpace, playerInbox);
         var playerController = new PlayerController(player);
