@@ -9,9 +9,10 @@ import java.util.Arrays;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.MessageFactory;
+import common.src.main.Messages.UIMessage;
 
 
-public class GameUI implements Runnable{
+public class GameUI implements Runnable {
     
     Space outbox;
     Space inbox;
@@ -28,14 +29,12 @@ public class GameUI implements Runnable{
     }
 
     public void run() {
-        // Get message
-        // If it is player's turn call takeTurn
-        // otherwise call some other method
-        
+    
         try {
 
             while (true) {
 
+                // Get message from player
                 var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
                 GameStateUpdate gsu = (GameStateUpdate)((IStateMessage<GameStateUpdate>) MessageFactory.create(message)).getState();
                 
@@ -43,12 +42,12 @@ public class GameUI implements Runnable{
                 ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
                 ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(gsu.possibleActions));
                 gameState = gsu.gameState;
-
+                
+                // Print the current state of the game
                 printOverview(gameState);
                 
                 takeTurn(possibleCards, hand, possibleActions);
             }
-
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -57,14 +56,18 @@ public class GameUI implements Runnable{
     }
 
     private void printOverview(GameState gameState) {
+
         System.out.println("A new round has begun!");
         System.out.println("The turn-order is:");
+
         for (PlayerState player : gameState.turnOrder) {
             System.out.println(player.toString());
         }
 
         System.out.println("It is currently " + (gameState.currentPlayerName.userName.equals(userName) ? "your turn" : (gameState.currentPlayerName.userName + "'s turn")));
+        
         printTopCard();
+        
         if (gameState.streak > 0) {
             System.out.println("There is currently a streak of " + gameState.streak);
         }
@@ -86,22 +89,26 @@ public class GameUI implements Runnable{
                     PlayerAction pa = possibleActions.get(i-1);
                     System.out.println(i + ". " + pa.toString());
                 }
-
-                int option = Integer.parseInt(reader.readLine());
+                
+                // Get choice input from player
+                int option = Integer.parseInt(reader.readLine()) - 1;
                 
                 getChoice = false;
 
-                if (option > possibleActions.size() || option <= 0) {
+                // Player choses a non-existing option
+                if (option >= possibleActions.size() || option < 0) {
                 System.out.println(wrongInput);
                 getChoice = true;
                 }
 
                 clearScreen();
-                if (possibleActions.get(option-1) == PlayerAction.PLAY) {
+
+                if (possibleActions.get(option) == PlayerAction.PLAY) {
                     playCard(hand, possibleCards);
                 } else {
                     try {
-                        outbox.put(possibleActions.get(option-1), -1);
+                        // Inform player of choice
+                        outbox.put((new UIMessage(possibleActions.get(option), "")).getFields());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -113,26 +120,33 @@ public class GameUI implements Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
             }        
-    }
-
+        }
     }
 
     private void playCard(ArrayList<Card> hand, ArrayList<Card> possibleCards) {
+        
         boolean getChoice = true;
+        
         while (getChoice) {
 
             try {
+
                 printHand(hand);
                 printTopCard();
+
                 System.out.println("Choose a card to play");
+
+                // Get choice input from player
                 int card = Integer.parseInt(reader.readLine())-1;
                 
-                if (card >= hand.size()) {
+                // Player chooses non-existing card
+                if (card >= hand.size() || card < 0) {
                     clearScreen();
                     System.out.println(wrongInput);
                     continue;
                 }
                 
+                // Player chooses a card that is impossible to play (according to rules)
                 if (!possibleCards.contains(hand.get(card))) {
                     clearScreen();
                     System.out.println("That is not a valid card.");
@@ -140,8 +154,11 @@ public class GameUI implements Runnable{
                 }
                 
                 clearScreen();
+
                 getChoice = false;
-                outbox.put(PlayerAction.PLAY, card);
+
+                // Inform player of choice
+                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card)));
                 
             } catch (InterruptedException e) {
                 e.printStackTrace();
