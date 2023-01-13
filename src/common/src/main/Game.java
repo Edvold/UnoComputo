@@ -7,6 +7,7 @@ import static common.src.main.Color.BLACK;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jspace.FormalField;
@@ -19,11 +20,14 @@ public class Game implements IGame {
     private Map<String, IPlayerConnection> players;
     private Space inbox;
     private ArrayList<String> playerNames;
+    private Map<String, Integer> playersHandSize;
+
 
     public Game(Map<String, IPlayerConnection> players, Space inbox) {
         this.players = players;
         this.inbox = inbox;
         playerNames = new ArrayList(players.keySet());
+        playersHandSize = new HashMap(players.size());
     }
 
     @Override
@@ -114,7 +118,11 @@ public class Game implements IGame {
 
     @Override
     public boolean isGameOver() {
-        // TODO Auto-generated method stub
+        for(int val : playersHandSize.values()){
+            if(val == 0){
+                return true;
+            }
+        }
         return false;
     }
 
