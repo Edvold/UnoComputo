@@ -58,20 +58,23 @@ public class Player implements IPlayer {
                     }
                     else if (newMessage.getMessageType() == MessageType.UIMessage){
                         UIMessage message = (UIMessage) newMessage;
-                        String action = message.getMessageText();
+                        PlayerAction action = message.getState();
                         switch (action) {
-                            case "Draw": gameSpace.put(new DrawCardsCommand("Draw"));
+                            case DRAW: gameSpace.put(new DrawCardsCommand("Draw"));
                                     token = "";
                                     break;
-                            case "End":  gameSpace.put(new PlayCardsCommand(saidUNO, output));
+                            case ENDTURN:  gameSpace.put(new PlayCardsCommand(saidUNO, output));
                                     token = "";
                                     break;
-                            case "UNO":  saidUNO = true;
+                            case UNO:  saidUNO = true;
                                     break;
-                            case "Object": gameSpace.put(new CallOutCommand(playerName));
+                            case OBJECT: gameSpace.put(new CallOutCommand(playerName));
                                     break;
-                            case "Play": addToOutput(message.getState());
-                                    hand.remove(message.getState());
+                            case PLAY: ACard playedCard = hand.get(Integer.parseInt(message.getMessageText()));
+                                    gameState.topCard = (Card) playedCard;
+                                    //maybe need to increase streak here
+                                    addToOutput(playedCard);
+                                    hand.remove(playedCard);
                                     actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.UNO,PlayerAction.OBJECT,PlayerAction.ENDTURN};
                                     break;
                     }
