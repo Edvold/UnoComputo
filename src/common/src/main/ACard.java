@@ -8,6 +8,11 @@ public abstract class ACard implements Comparable<ACard> {
 	public abstract void setColor(Color color);
 	public abstract boolean canChainWith(ACard other);
 	public abstract void resetWildCard();
+
+	public ACard() {
+		
+	}
+
 	@Override
 	public boolean equals(Object other){
 		if( !(other instanceof ACard) ){

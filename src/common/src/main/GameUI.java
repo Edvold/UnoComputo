@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import org.jspace.FormalField;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
+import common.src.main.Messages.PlayerMessage;
 
 
 public class GameUI implements Runnable{
@@ -32,18 +32,26 @@ public class GameUI implements Runnable{
         try {
 
             while (true) {
-                Object[] message = inbox.get(new FormalField(GameState.class), new FormalField(Object.class), new FormalField(Object.class), new FormalField(Object.class));
-                System.out.println("Got message!");
+                //var m  = new PlayerMessage(null, null, null, null).getTemplateBuilder()
+                //.addActualType().build();
+                Object message = (inbox.get(IMessage.getGeneralTemplate().getFields()))[1];
                 
+                assert true;
+                //ArrayList<ACard> possibleCards = new ArrayList<ACard>(Arrays.asList(message.possibleCards));
+                //ArrayList<ACard> hand =  new ArrayList<ACard>(Arrays.asList(message.hand));
+                //ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(message.possibleActions));
 
-                GameState gameState = (GameState) message[0];
-                ArrayList<ACard> possibleCards = (ArrayList<ACard>) message[1];
-                ArrayList<ACard> hand = (ArrayList<ACard>) message[2];
-                ArrayList<PlayerAction> possibleActions = (ArrayList<PlayerAction>) message[3];
+                // ArrayList<String> possibleStringActions = (ArrayList<String>) message[3];
                 
-                printOverview(gameState);
+                // ArrayList<PlayerAction> possibleActions = new ArrayList<>();
                 
-                takeTurn(possibleCards, hand, possibleActions);
+                // for (String playerAction : possibleStringActions) {
+                //     possibleActions.add(PlayerAction.valueOf(playerAction));
+                // }
+
+                //printOverview(message.gameState);
+                //
+                //takeTurn(possibleCards, hand, possibleActions);
             }
 
 
@@ -60,7 +68,7 @@ public class GameUI implements Runnable{
             System.out.println(player.toString());
         }
 
-        System.out.println("It is currently " + gameState.currentPlayerName.userName == userName ? "your turn" : (gameState.currentPlayerName.userName + "'s turn"));
+        System.out.println("It is currently " + (gameState.currentPlayerName.userName == userName ? "your turn" : (gameState.currentPlayerName.userName + "'s turn")));
         System.out.println("The top card is: " + gameState.topCard.toString());
         if (gameState.streak > 0) {
             System.out.println("There is currently a streak of " + gameState.streak);
@@ -81,7 +89,8 @@ public class GameUI implements Runnable{
                 System.out.println("Choose an option:");
                 
                 for (int i = 1; i <= possibleActions.size(); i++) {
-                    System.out.println(i + ". " + possibleActions.get(i-1).toString());
+                    PlayerAction pa = possibleActions.get(i-1);
+                    System.out.println(i + ". " + pa.toString());
                 }
 
                 int option = scanner.nextInt();
@@ -103,13 +112,13 @@ public class GameUI implements Runnable{
                     }
                 }
 
-        } catch (InputMismatchException e) {
-            System.out.println(wrongInput);
-        }
-        
-        finally {
-            scanner.close();
-        }
+            } catch (InputMismatchException e) {
+                System.out.println(wrongInput);
+            }
+            
+            finally {
+                scanner.close();
+            }
         
     }
 
@@ -157,9 +166,5 @@ public class GameUI implements Runnable{
             System.out.println(counter++ + ". " + card.toString());
         }
     }
-
-
- 
-
 
 }

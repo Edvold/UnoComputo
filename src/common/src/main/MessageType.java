@@ -34,5 +34,6 @@ public enum MessageType {
     JoinGameRequest, 
     StartGame,
     UIMessage,
+    PlayerMessage,
     GameOver,
 }

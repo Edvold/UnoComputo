@@ -2,12 +2,18 @@ package common.src.main;
 
 public class GameState {
     
-    final public PlayerState currentPlayerName;
-    final public ACard topCard;
-    final public PlayerState[] turnOrder; //players in order of their turns (not containing current)
-    final public int streak;
+    public PlayerState currentPlayerName;
+    public Card topCard;
+    public PlayerState[] turnOrder; //players in order of their turns (not containing current)
+    public int streak;
     
-    public GameState (PlayerState currentPlayerName, ACard topCard, PlayerState[] turnOrder, int streak){
+    public GameState() {
+        currentPlayerName = null;
+        topCard = null;
+        turnOrder = null;
+        streak = 0;
+    }
+    public GameState (PlayerState currentPlayerName, Card topCard, PlayerState[] turnOrder, int streak){
         this.currentPlayerName = currentPlayerName;
         this.topCard = topCard;
         this.turnOrder = turnOrder;
@@ -21,6 +27,10 @@ public class GameState {
         public PlayerState(String name, int size) {
             userName = name;
             handSize = size;
+        }
+
+        public String toString() {
+            return userName + " with " + handSize + " cards on their hand";
         }
     }
 }
