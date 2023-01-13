@@ -12,7 +12,7 @@ public final class InputRequest extends AStateMessage<IMessage> {
         this(message, "InputResonse-Thread:" + Thread.currentThread().threadId());
     }
 
-    private InputRequest(IMessage message, String responseTag) {
+    InputRequest(IMessage message, String responseTag) {
         super(InputRequest, message, responseTag);
     }
 

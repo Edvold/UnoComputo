@@ -15,5 +15,9 @@ public class PlayCardsCommand extends AStateMessage<List<ACard>> {
     public PlayCardsCommand(boolean sayUno, List<ACard> cards) {
         super(PlayCardsCommand, cards, sayUno ? "UNO" : "");
     }
+
+    PlayCardsCommand(String sayUno, List<ACard> cards) {
+        this(!sayUno.isBlank(), cards);
+    }
     
 }
