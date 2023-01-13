@@ -95,7 +95,7 @@ public class Game implements IGame{
         
         
         // awaits a description of players current turn
-        Object[] obj = inbox.get(new FormalField(ITurnDesription.class));
+        Object[] obj = inbox.get(new FormalField(ITurnDescription.class));
         
 
         //Send no time left to controller
