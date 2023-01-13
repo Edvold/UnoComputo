@@ -26,5 +26,14 @@ public interface IStateMessage<T> extends IMessage {
 
     public interface IStateMessageTemplateBuilder<T> extends IMessageTemplateBuilder {
         public IStateMessageTemplateBuilder<T> addActualState(T state);
+
+        @Override
+        public IStateMessageTemplateBuilder<T> addActualMessage(String message);
+
+        @Override
+        public IStateMessageTemplateBuilder<T> addActualType();
+
+        @Override
+        public IStateMessageTemplateBuilder<T> addActualType(MessageType type);
     }
 }

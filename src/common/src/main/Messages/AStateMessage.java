@@ -26,8 +26,16 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
         stateType = new TypeToken<T>(){}.getRawType();
     }
 
+    public AStateMessage(Object[] fields) {
+        if (!verifySpaceResult(fields)) throw new IllegalArgumentException();
+
+        type = (MessageType) fields[0];
+        state = (T) fields[1];
+        message = (String) fields[2];
+    }
+
     public IStateMessageTemplateBuilder<T> getTemplateBuilder() {
-        return new MessageTemplateBuilder(type, stateType);
+        return new MessageTemplateBuilder(type, stateType != null ? stateType : Object.class);
     }
 
     public Object[] getFields() {
@@ -41,6 +49,7 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
         return doesMatch;
     }
 
+
     public MessageType getMessageType() {
         return type;
     }
@@ -51,6 +60,18 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
 
     public String getMessageText() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("(")
+            .append(type)
+            .append(", ")
+            .append(state)
+            .append(", ")
+            .append(message)
+            .append(")")
+            .toString();
     }
 
     public class MessageTemplateBuilder implements IStateMessageTemplateBuilder<T> {
@@ -69,6 +90,11 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
         }
 
         public MessageTemplateBuilder addActualType() {
+            this.type = new ActualField(type);
+            return this;
+        }
+
+        public MessageTemplateBuilder addActualType(MessageType type) {
             this.type = new ActualField(type);
             return this;
         }
