@@ -1,11 +1,13 @@
 package common.src.main.Messages;
 
 import common.src.main.ACard;
+import common.src.main.PlayerAction;
+
 import static common.src.main.MessageType.UIMessage;;;
 
-public class UIMessage extends AStateMessage<ACard> {
+public class UIMessage extends AStateMessage<PlayerAction> {
 
-    public UIMessage(ACard state, String message) {
+    public UIMessage(PlayerAction state, String message) {
         super(UIMessage, state, message);
     }
     
