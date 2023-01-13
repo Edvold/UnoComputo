@@ -87,8 +87,8 @@ public class App {
 		
 		Thread uithread = new Thread(ui);
 		uithread.start();
-		
-		outbox.put(new PlayerMessage(gs, (Card[]) possibleCards.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]), (PlayerAction[]) pas.toArray(new PlayerAction[0])));
+		var message = new PlayerMessage(gs, (Card[]) possibleCards.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]), (PlayerAction[]) pas.toArray(new PlayerAction[0]));
+		outbox.put(message.getFields());
 	}
 
 }

@@ -55,13 +55,14 @@ public class GameUI implements Runnable{
         try {
 
             while (true) {
-                //Object[] message = inbox.get(new FormalField(GameState.class), new FormalField(Object.class), new FormalField(Object.class), new FormalField(Object.class));                
-                GameStateUpdate message = ((PlayerMessage) inbox.get(new FormalField(PlayerMessage.class))[0]).getState();
+                //var m  = new PlayerMessage(null, null, null, null).getTemplateBuilder()
+                //.addActualType().build();
+                Object message = (inbox.get(IMessage.getGeneralTemplate().getFields()))[1];
                 
-
-                ArrayList<ACard> possibleCards = new ArrayList<ACard>(Arrays.asList(message.possibleCards));
-                ArrayList<ACard> hand =  new ArrayList<ACard>(Arrays.asList(message.hand));
-                ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(message.possibleActions));
+                assert true;
+                //ArrayList<ACard> possibleCards = new ArrayList<ACard>(Arrays.asList(message.possibleCards));
+                //ArrayList<ACard> hand =  new ArrayList<ACard>(Arrays.asList(message.hand));
+                //ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(message.possibleActions));
 
                 // ArrayList<String> possibleStringActions = (ArrayList<String>) message[3];
                 
@@ -71,9 +72,9 @@ public class GameUI implements Runnable{
                 //     possibleActions.add(PlayerAction.valueOf(playerAction));
                 // }
 
-                printOverview(message.gameState);
-                
-                takeTurn(possibleCards, hand, possibleActions);
+                //printOverview(message.gameState);
+                //
+                //takeTurn(possibleCards, hand, possibleActions);
             }
 
 
