@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import org.jspace.RemoteSpace;
+import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
 
@@ -17,7 +18,7 @@ public class Client implements Runnable {
     
     private String ip = null;
     private Space lobbySpace;
-    private Space inbox;
+    private Space playerInbox;
     private SpaceRepository repository;
     private LobbyUI ui = LobbyUI.getInstance();
     private URI inboxUri; 
@@ -42,7 +43,7 @@ public class Client implements Runnable {
      */
     public Client(SpaceRepository repository, Space inbox, Space lobby) {
         lobbySpace = lobby;
-        this.inbox = inbox;
+        this.playerInbox = inbox;
         this.repository = repository;
     }
 
@@ -62,12 +63,13 @@ public class Client implements Runnable {
             setupRemoteLobby();
         }
         
+        String name = null;
 
         var gotAccepted = false;
         do {
-            var name = ui.getInput("Enter your name: ");
+            name = ui.getInput("Enter your name: ");
             lobbySpace.put(MessageType.JoinGameRequest, inboxUri, name);
-            var response = inbox.get(IMessage.getGeneralTemplate().getFields());
+            var response = playerInbox.get(IMessage.getGeneralTemplate().getFields());
             
             switch((String)response[2]) {
                 case "Accepted" -> { gotAccepted = true; ui.showMessage("You have successfully joined the game lobby"); }
@@ -76,13 +78,28 @@ public class Client implements Runnable {
             };
         } while(!gotAccepted);
 
-        while (true) {
-            var message = inbox.get(IMessage.getGeneralTemplate().getFields());
-            ui.showMessage(new AStateMessage<Object>(message) {
-                
-            });
+        var hasGameStarted = false;
+        while (!hasGameStarted) {
+            var response = playerInbox.get(IMessage.getGeneralTemplate().getFields());
+            var messageType = (MessageType)response[0];
+            switch(messageType) {
+                case StartGame -> hasGameStarted = true;
+                default -> {
+                    var message = AStateMessage.fromResponse(response);
+                    ui.showMessage(message);
+                }
+            }
             //TODO handle messages
         }
+
+        ui.stop();
+
+        Space uiSpace = new SequentialSpace();
+        new Thread(new GameUI(uiSpace, playerInbox)).start();
+        
+        IPlayer player = new Player(name, lobbySpace, uiSpace, playerInbox);
+        var playerController = new PlayerController(player);
+        playerController.start();
     }
 
     public void setupRemoteLobby() throws InterruptedException, UnknownHostException, IOException {
@@ -123,7 +140,7 @@ public class Client implements Runnable {
 
         var uri = ipToUri(ip, port);
         repository.addGate(uri);
-        repository.add(CLIENT_NAME, inbox);
+        repository.add(CLIENT_NAME, playerInbox);
         inboxUri = ipToUri(ip, port, CLIENT_NAME);
     }
 
