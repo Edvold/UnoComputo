@@ -190,4 +190,14 @@ public class Game implements IGame {
             }
         }
     }
+
+    public int computeStreak(ACard[] playedCards) {
+        int streak = 0;
+        for (ACard card : playedCards) {
+            if(card.getAction().equals(Action.DRAW2) || card.getAction().equals(Action.WILDDRAW4)){
+                streak++;
+            }
+        }
+        return streak;
+    }
 }

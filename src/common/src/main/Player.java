@@ -7,7 +7,6 @@ import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.Space;
 
-import common.src.main.Messages.AStateMessage;
 import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.MessageFactory;
@@ -29,6 +28,8 @@ public class Player implements IPlayer {
     private Space gameSpace;
     private boolean saidUNO = false;
     private Thread callOutCheckerThread;
+    private PlayerAction[] actions;
+    private boolean playedFirstCard;
 
     public Player (String name, Space gameSpace, Space UISpace, Space playerInbox) {
         playerName = name;
@@ -41,17 +42,18 @@ public class Player implements IPlayer {
     @Override
     public void run() throws InterruptedException {
         getDrawnCards(); // get initial hand
-
         String token = "";
         while (true) {
+            playedFirstCard = false;
             NextPlayerCommand turnMessage = (NextPlayerCommand) gameSpace.get(new FormalField(NextPlayerCommand.class))[0];
             this.gameState = ((NewGameStateMessage) gameSpace.get(new FormalField(NewGameStateMessage.class))[0]).getState();
             token = turnMessage.getState();
             if (token.equals("turnToken")) {
             // It is your turn
-                PlayerAction[] actions = {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
+                computeActions(token);
                 while (token.equals("turnToken")) {
-                    UISpace.put(new PlayerMessage(gameState, (Card[]) getPlayableCards(hand, gameState.topCard).toArray(), (Card[]) hand.toArray(), actions)); //message?
+                    ArrayList<ACard> playables = playedFirstCard ? getStackingCards(hand, gameState.topCard) : getPlayableCards(hand, gameState.topCard);
+                    UISpace.put(new PlayerMessage(gameState, (Card[]) playables.toArray(), (Card[]) hand.toArray(), actions)); //message?
                     IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
                     if(newMessage.getMessageType() == MessageType.CallOutCommand){
                         CallOutCommand message = (CallOutCommand) newMessage;
@@ -65,7 +67,8 @@ public class Player implements IPlayer {
                         UIMessage message = (UIMessage) newMessage;
                         PlayerAction action = message.getState();
                         switch (action) {
-                            case DRAW: gameSpace.put(new DrawCardsCommand("Draw"));
+                            case DRAW: String reason = gameState.streak > 0 ? "Streak" : "Draw";
+                                gameSpace.put(new DrawCardsCommand(reason));
                                 getDrawnCards();
                                     token = "";
                                     break;
@@ -78,7 +81,10 @@ public class Player implements IPlayer {
                                     break;
                             case PLAY: ACard playedCard = hand.get(Integer.parseInt(message.getMessageText()));
                                     gameState.topCard = (Card) playedCard;
-                                    //maybe need to increase streak here
+                                    playedFirstCard = true;
+                                    if (playedCard.getAction().equals(Action.DRAW2) || playedCard.getAction().equals(Action.WILDDRAW4)){
+                                        gameState.streak++;
+                                    }
                                     addToOutput(playedCard);
                                     hand.remove(playedCard);
                                     actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.UNO,PlayerAction.OBJECT,PlayerAction.ENDTURN};
@@ -88,7 +94,7 @@ public class Player implements IPlayer {
             }
         }
             else {
-                PlayerAction[] actions = {PlayerAction.OBJECT};
+                computeActions(token);
                 // It is not your turn
                 if(!callOutCheckerThread.isAlive()){
                     callOutCheckerThread.start();
@@ -114,6 +120,16 @@ public class Player implements IPlayer {
         ArrayList<ACard> playables = new ArrayList<>(hand); //This will work if cards aren't changed until after they are played
         playables.removeIf(card -> !card.canBePlayedOn(topCard));
         return playables;
+    }
+
+    public ArrayList<ACard> getStackingCards(ArrayList<ACard> hand, ACard topCard){
+        ArrayList<ACard> stackables = new ArrayList<>();
+        for (ACard card : hand){
+            if (card.getAction().equals(topCard.getAction())){
+                stackables.add(card);
+            }
+        }
+        return stackables;
     }
 
     @Override
@@ -147,6 +163,20 @@ public class Player implements IPlayer {
 
         this.hand.addAll(newCards);
     } 
+
+    public void computeActions(String token) {
+        if (token.equals("turnToken")){
+            if(gameState.streak > 0){
+                actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.OBJECT,PlayerAction.UNO};
+            }
+            else{
+                actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
+            }
+        }
+        else {
+            actions = new PlayerAction[] {PlayerAction.OBJECT};
+        }
+    }
     
 }
 
