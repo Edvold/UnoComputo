@@ -13,6 +13,7 @@ import java.util.Map;
 import org.jspace.FormalField;
 import org.jspace.Space;
 
+import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
 
@@ -113,8 +114,18 @@ public class Game implements IGame {
     }
 
     public boolean isObjectionCorrect() {
-        // TODO Auto-generated method stub
-        return false;
+
+        GameState gameState = new GameState(); // Get actual gamestate
+        String lastPlayerName = playerNames.get(playerNames.size()-1);
+
+        PlayerState lastPlayer = null;
+
+        for (PlayerState player : gameState.turnOrder) {
+            if (player.userName.equals(lastPlayerName)) lastPlayer = player;
+        }
+
+        return !gameState.saidUNO && lastPlayer.handSize == 1;
+
     }
 
     @Override

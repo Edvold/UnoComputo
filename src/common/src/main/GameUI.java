@@ -10,6 +10,7 @@ import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.MessageFactory;
 import common.src.main.Messages.UIMessage;
+import common.src.main.Messages.UpdateMessage;
 
 
 public class GameUI implements Runnable {
@@ -35,7 +36,10 @@ public class GameUI implements Runnable {
             while (true) {
 
                 // Get message from player
+                // How to differentiate between two message types? PlayerMessage & UpdateMessage
+                // Want to get on PlayerMessage and getp on UpdateMessage
                 var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
+                
                 GameStateUpdate gsu = (GameStateUpdate)((IStateMessage<GameStateUpdate>) MessageFactory.create(message)).getState();
                 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
@@ -43,6 +47,8 @@ public class GameUI implements Runnable {
                 ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(gsu.possibleActions));
                 gameState = gsu.gameState;
                 
+                
+
                 // Print the current state of the game
                 printOverview(gameState);
                 

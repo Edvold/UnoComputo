@@ -6,6 +6,7 @@ public class GameState {
     public Card topCard;
     public PlayerState[] turnOrder; //players in order of their turns (not containing current)
     public int streak;
+    public boolean saidUNO;
     
     public GameState() {
         currentPlayerName = null;
