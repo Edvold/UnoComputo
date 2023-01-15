@@ -140,8 +140,13 @@ public class Game implements IGame {
 
     @Override
     public String getWinner() {
-        // TODO Auto-generated method stub
-        return null;
+        String s = "";
+        for (Map.Entry<String, Integer> pair : playersHandSize.entrySet()) {
+            if(pair.getValue() == 0){
+                s = pair.getKey();
+            }
+        }
+        return s;
     }
 
 
