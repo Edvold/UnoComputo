@@ -242,9 +242,12 @@ public class Game implements IGame {
     }
 
     public void reverse(int n){
+        var currentPlayer = currentPlayer();
         if(n%2 == 1){
             Collections.reverse(playerNames);
         }
+        playerNames.remove(currentPlayer);
+        playerNames.add(0, currentPlayer);
     }
 
     @Override
