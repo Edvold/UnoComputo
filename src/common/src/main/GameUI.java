@@ -59,15 +59,15 @@ public class GameUI implements Runnable {
                 }
 
                 if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
-                    // objectChecker = new ObjectChecker(outbox);
-                    // objectCheckerThread = new Thread(objectChecker);
-                    // objectCheckerThread.start();
+                    objectChecker = new ObjectChecker(outbox);
+                    objectCheckerThread = new Thread(objectChecker);
+                    objectCheckerThread.start();
 
                 } else {
-                    // if (objectCheckerThread.isAlive()) {
-                    // objectChecker.stop();
-                    // objectCheckerThread.interrupt();
-                    // }
+                    if (objectCheckerThread.isAlive()) {
+                    objectChecker.stop();
+                    objectCheckerThread.interrupt();
+                    }
                     takeTurn(possibleCards, hand, possibleActions);
                 }
             }
