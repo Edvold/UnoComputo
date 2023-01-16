@@ -60,7 +60,7 @@ public class Player implements IPlayer {
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
                     } else if (newMessage[0] == MessageType.Update) {
-                        UISpace.put(new UpdateMessage((String) newMessage[1]).getFields());
+                        UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
                     } else if (newMessage[0] == MessageType.UIMessage) {
                         PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
@@ -115,7 +115,7 @@ public class Player implements IPlayer {
             }
         }
     }
-
+   
     @Override
     public void addToOutput(Card card) {
         output.add(card);

@@ -6,17 +6,17 @@ import static common.src.main.MessageType.PlayCardsCommand;
 
 import java.util.List;;
 
-public class PlayCardsCommand extends AStateMessage<List<Card>> {
+public class PlayCardsCommand extends AStateMessage<Card[]> {
 
     public PlayCardsCommand(boolean sayUno, Card... cards) {
-        this(sayUno, List.of(cards));
-    }
-
-    public PlayCardsCommand(boolean sayUno, List<Card> cards) {
         super(PlayCardsCommand, cards, sayUno ? "UNO" : "");
     }
 
-    PlayCardsCommand(String sayUno, List<Card> cards) {
+    public PlayCardsCommand(boolean sayUno, List<Card> cards) {
+        this(sayUno, cards.toArray(new Card[0]));
+    }
+
+    PlayCardsCommand(String sayUno, Card[] cards) {
         this(!sayUno.isBlank(), cards);
     }
     

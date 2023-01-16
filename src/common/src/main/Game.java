@@ -167,29 +167,31 @@ public class Game implements IGame {
             } else if(message instanceof PlayCardsCommand) {
                 var playCommand = (PlayCardsCommand) message;
                 var playedCards = playCommand.getState();
-                var action = playedCards.get(0).getAction();
+                var action = playedCards[0].getAction();
                 //TODO validate cards can be played
                 if (action == Action.SKIP) {
-                    skip(playedCards.size());
+                    skip(playedCards.length);
                 } else if (action == Action.REVERSE) {
-                    reverse(playedCards.size());
+                    reverse(playedCards.length);
                 } else if (action == Action.DRAW2 || action == WILDDRAW4) {
-                    if(gameState.streak == 0 || playedCards.get(0).canChainWith(gameState.topCard)) { 
-                        gameState.streak += playedCards.size();
+                    if(gameState.streak == 0 || playedCards[0].canChainWith(gameState.topCard)) { 
+                        gameState.streak += playedCards.length;
                     }
                 }
-
-                discardPile.addAll(playedCards);
+                
+                for (Card card : playedCards) {
+                    discardPile.add(card);
+                }
                 gameState.topCard = (Card)discardPile.peek();
                 gameState.saidUNO = playCommand.didSayUno();
             } else {
                 System.out.println("unexpected message encountered and ignored: (" + message.getClass() + ") " + message.toString());
             }
 
-            updateStateTurnOrder();
+            updateStateTurnOrder();//? move down to moveTurnToNextPlayer??
         } while (
             message.getMessageType() != MessageType.PlayCardsCommand 
-            || message.getMessageType() != MessageType.DrawCardsCommand
+            && message.getMessageType() != MessageType.DrawCardsCommand
         ); 
 
         moveTurnToNextPlayer();
@@ -228,9 +230,13 @@ public class Game implements IGame {
 
 
     public void skip(int n){
-        for(int j = 0; j < n;j++){
-            playerNames.add(playerNames.get(playerNames.size()-1));
+        for(int j = 0; j < n; j++){
+            playerNames.add(playerNames.get(0));
             playerNames.remove(0);
+            
+            if(playerNames.get(0).equals(currentPlayer())) {
+                j--; //The player playing the cards 
+            }
         }
     }
 
@@ -310,15 +316,15 @@ public class Game implements IGame {
     }
 
     private String currentPlayer() {
-        return playerNames.get(0);
+        return gameState.turnOrder[0].userName;
     }
 
     private String nextPlayer() {
-        return playerNames.get(1);
+        return gameState.turnOrder[1].userName;
     }
 
     private String previousPlayer() {
-        return playerNames.get(playerNames.size() - 1);
+        return gameState.turnOrder[playerNames.size() - 1].userName;
     }
 
     private void moveTurnToNextPlayer() {
