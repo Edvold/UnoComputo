@@ -42,6 +42,14 @@ public class Player implements IPlayer {
         String token = "";
         while (true) {
             playedFirstCard = false;
+            var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
+            new FormalField(Object.class), new FormalField(String.class));
+
+            if(gameOverMessage != null) {
+                UISpace.put(new UpdateMessage((String)gameOverMessage[2]));
+                return;
+            }
+
             var turnMessage = playerInbox.get(new ActualField(MessageType.NextPlayerCommand),
                     new FormalField(String.class), new FormalField(String.class));
             this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
