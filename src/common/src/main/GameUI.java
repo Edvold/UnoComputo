@@ -24,7 +24,7 @@ public class GameUI implements Runnable {
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
     BufferedReader reader = new BufferedReader((new InputStreamReader(System.in)));
-    Thread objectCheckerThread;
+    Thread objectCheckerThread = new Thread();
     ObjectChecker objectChecker;
 
 
@@ -67,7 +67,6 @@ public class GameUI implements Runnable {
                 } else {
                     if (objectCheckerThread.isAlive()) {
                         objectChecker.stop();
-
                         objectCheckerThread.interrupt();
                     }
                     takeTurn(possibleCards, hand, possibleActions);
