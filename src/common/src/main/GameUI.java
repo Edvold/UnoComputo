@@ -9,10 +9,11 @@ import java.util.Arrays;
 import org.jspace.FormalField;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
-import common.src.main.Messages.MessageFactory;
-import common.src.main.Messages.PlayerMessage;
 import common.src.main.Messages.UIMessage;
-import common.src.main.Messages.UpdateMessage;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
 
 public class GameUI implements Runnable {
@@ -23,6 +24,8 @@ public class GameUI implements Runnable {
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
     BufferedReader reader = new BufferedReader((new InputStreamReader(System.in)));
+    Thread objectCheckerThread;
+    ObjectChecker objectChecker;
 
 
     public GameUI(Space inbox, Space outbox, String name) {
@@ -48,7 +51,7 @@ public class GameUI implements Runnable {
                 
                 
                 // Print the current state of the game
-                printOverview(gameState);
+                printOverview();
                 
                 // Get and print update message if any exists
                 var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class), new FormalField(String.class));
@@ -56,7 +59,19 @@ public class GameUI implements Runnable {
                     printUpdateMessage((String)message[2]);
                 }
 
-                takeTurn(possibleCards, hand, possibleActions);
+                if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
+                    objectChecker = new ObjectChecker(outbox);
+                    objectCheckerThread = new Thread(objectChecker);
+                    objectCheckerThread.start();
+
+                } else {
+                    if (objectCheckerThread.isAlive()) {
+                        objectChecker.stop();
+
+                        objectCheckerThread.interrupt();
+                    }
+                    takeTurn(possibleCards, hand, possibleActions);
+                }
             }
 
         } catch (InterruptedException e) {
@@ -72,7 +87,9 @@ public class GameUI implements Runnable {
         System.out.println("===========================================");
     }
 
-    private void printOverview(GameState gameState) {
+    private void printOverview() {
+
+        if (gameState.saidUNO) System.out.println(getLastPlayerName() + "has said UNO!");
 
         System.out.println("A new round has begun!");
         System.out.println("The turn-order is:");
@@ -88,6 +105,14 @@ public class GameUI implements Runnable {
         if (gameState.streak > 0) {
             System.out.println("There is currently a streak of " + gameState.streak);
         }
+    }
+
+    private String getLastPlayerName() {
+        int index = 0;
+        for (int i = 0; i < gameState.turnOrder.length; i++) {
+            if (gameState.turnOrder[i] == gameState.currentPlayerName) index = i-1;
+        }
+        return gameState.turnOrder[index].userName;
     }
 
     private void takeTurn(ArrayList<Card> possibleCards, ArrayList<Card> hand, ArrayList<PlayerAction> possibleActions) {
@@ -205,5 +230,53 @@ public class GameUI implements Runnable {
     private void clearScreen() {
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
+
+}
+
+class ObjectChecker implements Runnable {
+    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private final Space outbox;
+
+
+    public ObjectChecker(Space outbox) {
+        this.outbox = outbox;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("You can choose to");
+        System.out.println("1. " + PlayerAction.OBJECT);
+            try {
+                String input = reader.readLine();
+                if (input.equals("1")) {
+                    System.out.println("Got input");
+                    outbox.put(new UIMessage(PlayerAction.OBJECT, ""));
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        
+        
+    }
+
+    public void stop() {
+        try {
+            // Can't interrupt reader.readLine()
+            // It will keep waiting for input even though we interrupt the thread
+            // So a simulation of a press of enter is needed to end the read 
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_ENTER);
+        } catch (AWTException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+    
 
 }
