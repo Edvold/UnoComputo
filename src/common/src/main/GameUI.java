@@ -38,7 +38,7 @@ public class GameUI implements Runnable {
         try {
 
             while (true) {
-                
+
                 GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
                         new FormalField(Object.class), new FormalField(String.class))[1];
 
@@ -54,20 +54,20 @@ public class GameUI implements Runnable {
                 // Get and print update message if any exists
                 var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
                         new FormalField(String.class));
-                if (message != null && !((String)message[2]).equals("")) {
+                if (message != null && !((String) message[2]).equals("")) {
                     printUpdateMessage((String) message[2]);
                 }
 
                 if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
-                    objectChecker = new ObjectChecker(outbox);
-                    objectCheckerThread = new Thread(objectChecker);
-                    objectCheckerThread.start();
+                    // objectChecker = new ObjectChecker(outbox);
+                    // objectCheckerThread = new Thread(objectChecker);
+                    // objectCheckerThread.start();
 
                 } else {
-                    if (objectCheckerThread.isAlive()) {
-                        objectChecker.stop();
-                        objectCheckerThread.interrupt();
-                    }
+                    // if (objectCheckerThread.isAlive()) {
+                    // objectChecker.stop();
+                    // objectCheckerThread.interrupt();
+                    // }
                     takeTurn(possibleCards, hand, possibleActions);
                 }
             }
