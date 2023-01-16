@@ -54,7 +54,7 @@ public class GameUI implements Runnable {
                 // Get and print update message if any exists
                 var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
                         new FormalField(String.class));
-                if (message != null || !((String)message[2]).equals("")) {
+                if (message != null && !((String)message[2]).equals("")) {
                     printUpdateMessage((String) message[2]);
                 }
 

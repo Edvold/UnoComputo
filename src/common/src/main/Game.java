@@ -59,7 +59,6 @@ public class Game implements IGame {
                     }
                 }
             }
-            System.out.println("I'm Here");
         } catch (InterruptedException e) {
             e.printStackTrace(); // TODO error handeling
         }  
