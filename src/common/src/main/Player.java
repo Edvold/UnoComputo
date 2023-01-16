@@ -67,7 +67,7 @@ public class Player implements IPlayer {
                         actions.remove(PlayerAction.PLAY);
                     }
 
-                    UISpace.put(new PlayerMessage(gameState, playables.toArray(new Card[playables.size()]), hand.toArray(new Card[hand.size()]),
+                    UISpace.put(new PlayerMessage(gameState, playables.toArray(new Card[0]), hand.toArray(new Card[0]),
                             (PlayerAction[])actions.toArray(new PlayerAction[0])).getFields()); // message?
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
                     if (newMessage[0] == MessageType.CallOutCommand) {
