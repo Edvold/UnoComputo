@@ -14,7 +14,7 @@ public class MessageFactory {
     public static IMessage create(Object[] fields) {
         return switch ((MessageType) fields[0]) {
             case NextPlayerCommand -> new NextPlayerCommand((String) fields[1], (String) fields[2]); 
-            case PlayCardsCommand -> new PlayCardsCommand((String) fields[2], (List<Card>)fields[1]); 
+            case PlayCardsCommand -> new PlayCardsCommand((String) fields[2], (Card[])fields[1]); 
             case DrawCardsCommand -> new DrawCardsCommand((Card[])fields[1], (String) fields[2]); 
             case CallOutCommand -> new CallOutCommand((String) fields[2]); 
             case Update -> new UpdateMessage((String) fields[2]); 

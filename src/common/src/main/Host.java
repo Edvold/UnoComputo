@@ -87,6 +87,7 @@ public final class Host implements Runnable {
                 } else if (requestCommand == MessageType.StartGame){
                     if(playerSpaces.size() < 2) {
                         ui.showMessage("Game cannot start with less than 2 players");
+                        openHostInputListener(lobbySpace);
                         continue;
                     }
                     break;
@@ -189,7 +190,7 @@ public final class Host implements Runnable {
                         var text = ui.getInput("> ");
                         if (text.equalsIgnoreCase("start")) {
                             lobbySpace.put(new GenericMessage(MessageType.StartGame, "The game should now start" ).getFields());
-                            return;
+                            return; 
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();

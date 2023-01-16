@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
@@ -40,7 +41,7 @@ public class GameUI implements Runnable {
 
             while (true) {
 
-                GameStateUpdate gsu = (GameStateUpdate)inbox.get(new FormalField(MessageType.PlayerMessage.getClass()), new FormalField(Object.class), new FormalField(String.class))[1];
+                GameStateUpdate gsu = (GameStateUpdate)inbox.get(new ActualField(MessageType.PlayerMessage), new FormalField(Object.class), new FormalField(String.class))[1];
 
                 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
@@ -277,7 +278,7 @@ class ObjectChecker implements Runnable {
                 String input = reader.readLine();
                 if (input.equals("1")) {
                     System.out.println("Got input");
-                    outbox.put(new UIMessage(PlayerAction.OBJECT, ""));
+                    outbox.put(new UIMessage(PlayerAction.OBJECT, "").getFields());
                 }
 
             } catch (InterruptedException e) {
@@ -292,16 +293,16 @@ class ObjectChecker implements Runnable {
     }
 
     public void stop() {
-        try {
-            // Can't interrupt reader.readLine()
-            // It will keep waiting for input even though we interrupt the thread
-            // So a simulation of a press of enter is needed to end the read 
-            Robot robot = new Robot();
-            robot.keyPress(KeyEvent.VK_ENTER);
-        } catch (AWTException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        //     // Can't interrupt reader.readLine()
+        //     // It will keep waiting for input even though we interrupt the thread
+        //     // So a simulation of a press of enter is needed to end the read 
+        //     Robot robot = new Robot();
+        //     robot.keyPress(KeyEvent.VK_ENTER);
+        // } catch (AWTException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
     }
     
