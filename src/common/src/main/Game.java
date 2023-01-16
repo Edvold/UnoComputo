@@ -14,8 +14,14 @@ import org.jspace.FormalField;
 import org.jspace.Space;
 
 import common.src.main.GameState.PlayerState;
+import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
+import common.src.main.Messages.MessageFactory;
+import common.src.main.Messages.NewGameStateMessage;
+import common.src.main.Messages.NextPlayerCommand;
+import common.src.main.Messages.PlayCardsCommand;
+import common.src.main.Messages.UpdateMessage;
 
 public class Game implements IGame {
 
@@ -31,6 +37,7 @@ public class Game implements IGame {
         this.inbox = inbox;
         playerNames = new ArrayList(players.keySet());
         playersHandSize = new HashMap(players.size());
+        gameState = new GameState();
     }
 
     @Override
@@ -74,11 +81,12 @@ public class Game implements IGame {
     }
 
     public ACard[] draw(int amount) throws InterruptedException {
-        if(amount > deck.size()){
-            shuffleDeck();
-        }
+        
         ACard[] cards = new ACard[amount];
         for(int i = 0; i < amount;i++){
+            if(deck.size() == 0){
+                shuffleDeck();
+            }
             cards[i] = (ACard) (deck.get(new FormalField(ACard.class))[0]);
         }
         return cards;
@@ -87,44 +95,113 @@ public class Game implements IGame {
     @Override
     public void startNextRound() throws InterruptedException {
         String currentPlayer = playerNames.get(0);
-        players.get(currentPlayer).getPlayerInbox().put("turnToken");
 
-        //send to all
-        for(IPlayerConnection player : players.values()){
-            player.getPlayerInbox().put("Current gameState");
-            // TODO insert:  player.getPlayerInbox().put("begun", currentPlayer, gameState); 
+        var nextPlayerNoTokenMessage = new NextPlayerCommand(currentPlayer);
+
+        // Inform all that new turn has begun
+        for (var player : players.values()){
+            if(player.getPlayerName().equals(currentPlayer)) {
+                player.getPlayerInbox().put(new NextPlayerCommand("TurnToken", currentPlayer));
+            } else {
+                player.getPlayerInbox().put(nextPlayerNoTokenMessage);
+            }
         }
-        
-        //inbox.get(IMessage.getGeneralTemplate().getFields());
-        
-        
-        // awaits a description of players current turn
-        Object[] obj = inbox.get(new FormalField(ITurnDescription.class));
-        
 
-        //Send no time left to controller
-        // or
-        // Update internal gameState
+        IMessage message = null;
+        do {
+            //send current game state to all
+            for(IPlayerConnection player : players.values()){
+                player.getPlayerInbox().put(new NewGameStateMessage(gameState));
+            }
+            
+            var fields = inbox.get(IMessage.getGeneralTemplate().getFields());
+            message = MessageFactory.create(fields);
+            
+            if (message instanceof CallOutCommand) {
+                var correctObjection = isObjectionCorrect();
+                if(correctObjection) {
+                    var player = previousPlayer();
+                    var playerConnection = players.get(previousPlayer()).getPlayerInbox();
+                    var drawnCards = draw(2);
+                    playersHandSize.compute(player, (key, value) -> value + drawnCards.length);
+                    
 
-        // first figure out next player (what is the player order and which direction are we going)
-        // send message to all that new round has begun. (include turn token in message to new current player)
-        // send game state to all players 
-        // await turn description from current player and objections from all players
-        // if objection is raised check it and send new game state if valid
-        // update internal state to reflect player commands
+                    playerConnection.put(
+                        new DrawCardsCommand(
+                            drawnCards, 
+                            "You were called out for forgetting to say Uno!"));
+
+                } 
+
+                for(IPlayerConnection player : players.values()){
+                    var text = new StringBuilder(message.getMessageText())
+                        .append(" objected ")
+                        .append(correctObjection ? "correctly" : "incorrectly");
+
+                    player.getPlayerInbox()
+                        .put(new UpdateMessage(text.toString()));
+                }
+                
+            } else if(message instanceof DrawCardsCommand) {
+                var drawAmount = 1;
+                var reason = "";
+
+                if(gameState.streak > 0) {
+                    var multiplier = gameState.topCard.getAction() == WILDDRAW4 ? 4 : 2;
+                    drawAmount = gameState.streak * multiplier;
+                    reason = new StringBuilder("A streak of ")
+                        .append(gameState.streak)
+                        .append(" ")
+                        .append(gameState.topCard.getAction())
+                        .append(" cards were in play when you drew cards")
+                        .toString();
+                    gameState.streak = 0;
+                }
+                var drawnCards = draw(drawAmount);
+                players
+                    .get(currentPlayer)
+                    .getPlayerInbox()
+                    .put(new DrawCardsCommand(drawnCards, reason));
+                
+                playersHandSize.compute(currentPlayer, (key, value) -> value + drawnCards.length);
+            } else if(message instanceof PlayCardsCommand) {
+                var playCommand = (PlayCardsCommand) message;
+                var playedCards = playCommand.getState();
+                var action = playedCards.get(0).getAction();
+                //TODO validate cards can be played
+                if (action == Action.SKIP) {
+                    skip(playedCards.size());
+                } else if (action == Action.REVERSE) {
+                    reverse(playedCards.size());
+                } else if (action == Action.DRAW2 || action == WILDDRAW4) {
+                    if(gameState.streak == 0 || playedCards.get(0).canChainWith(gameState.topCard)) { 
+                        gameState.streak += playedCards.size();
+                    }
+                }
+
+                discardPile.addAll(playedCards);
+                gameState.topCard = (Card)discardPile.peek();
+                gameState.saidUNO = playCommand.didSayUno();
+            } else {
+                System.out.println("unexpected message encountered and ignored: (" + message.getClass() + ") " + message.toString());
+            }
+
+            updateStateTurnOrder();
+        } while (
+            message.getMessageType() != MessageType.PlayCardsCommand 
+            || message.getMessageType() != MessageType.DrawCardsCommand
+        ); 
+
+        moveTurnToNextPlayer();
     }
 
     public boolean isObjectionCorrect() {
 
-        String lastPlayerName = playerNames.get(playerNames.size()-1);
+        String lastPlayerName = previousPlayer();
 
-        PlayerState lastPlayer = null;
+        var handSize = playersHandSize.get(lastPlayerName);
 
-        for (PlayerState player : gameState.turnOrder) {
-            if (player.userName.equals(lastPlayerName)) lastPlayer = player;
-        }
-
-        return !gameState.saidUNO && lastPlayer.handSize == 1;
+        return !gameState.saidUNO && handSize == 1;
 
     }
 
@@ -181,12 +258,15 @@ public class Game implements IGame {
         for(IPlayerConnection player : players.values()){
             try {
                 ACard[] hand = draw(7);
+                playersHandSize.put(player.getPlayerName(), 7);
                 player.getPlayerInbox().put(new DrawCardsCommand(hand, "Getting Starting Hand"));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
+        gameState.currentPlayerName = new PlayerState(playerNames.get(0), 7); 
+        updateStateTurnOrder();
     }
     
     @Override
@@ -215,5 +295,34 @@ public class Game implements IGame {
             }
         }
         return streak;
+    }
+
+    private void updateStateTurnOrder() {
+        if (gameState.turnOrder.length < playerNames.size()) {
+            gameState.turnOrder = new PlayerState[playersHandSize.size()];
+        }
+
+        for (int i = 0; i < playerNames.size(); i++) {
+            var playerState = new PlayerState(playerNames.get(i), playersHandSize.get(playerNames.get(i)));
+            gameState.turnOrder[i] = playerState;
+        }
+    }
+
+    private String currentPlayer() {
+        return playerNames.get(0);
+    }
+
+    private String nextPlayer() {
+        return playerNames.get(1);
+    }
+
+    private String previousPlayer() {
+        return playerNames.get(playerNames.size() - 1);
+    }
+
+    private void moveTurnToNextPlayer() {
+        skip(1);
+        updateStateTurnOrder();
+        gameState.currentPlayerName = gameState.turnOrder[0];
     }
 }

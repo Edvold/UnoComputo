@@ -20,4 +20,7 @@ public class PlayCardsCommand extends AStateMessage<List<ACard>> {
         this(!sayUno.isBlank(), cards);
     }
     
+    public boolean didSayUno() {
+        return message.equalsIgnoreCase("uno");
+    }
 }
