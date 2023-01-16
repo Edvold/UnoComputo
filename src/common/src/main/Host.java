@@ -188,7 +188,7 @@ public final class Host implements Runnable {
                     try {
                         var text = ui.getInput("> ");
                         if (text.equalsIgnoreCase("start")) {
-                            lobbySpace.put(MessageType.StartGame, "", "");
+                            lobbySpace.put(new GenericMessage(MessageType.StartGame, "The game should now start" ).getFields());
                             return;
                         }
                     } catch (InterruptedException e) {

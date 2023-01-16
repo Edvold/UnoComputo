@@ -100,7 +100,7 @@ public abstract class AStateMessage<T> implements IStateMessage<T> {
         }
 
         public MessageTemplateBuilder addActualType() {
-            this.type = new ActualField(type);
+            this.type = new ActualField(messageType);
             return this;
         }
 

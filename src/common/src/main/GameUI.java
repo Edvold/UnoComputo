@@ -192,7 +192,7 @@ public class GameUI implements Runnable {
                 getChoice = false;
 
                 // Inform player of choice
-                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card)));
+                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card)).getFields());
                 
             } catch (InterruptedException e) {
                 e.printStackTrace();

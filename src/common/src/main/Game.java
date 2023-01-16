@@ -67,7 +67,7 @@ public class Game implements IGame {
 
     @Override
     public void shuffleDeck() {
-        ACard topCard = discardPile.pop();
+        Card topCard = discardPile.pop();
         try
         {
             for(ACard c : discardPile){
@@ -80,30 +80,30 @@ public class Game implements IGame {
         discardPile.push(topCard);     
     }
 
-    public ACard[] draw(int amount) throws InterruptedException {
+    public Card[] draw(int amount) throws InterruptedException {
         
-        ACard[] cards = new ACard[amount];
+        Card[] cards = new Card[amount];
         for(int i = 0; i < amount;i++){
             if(deck.size() == 0){
                 shuffleDeck();
             }
-            cards[i] = (ACard) (deck.get(new FormalField(ACard.class))[0]);
+            cards[i] = (Card)(deck.get(new FormalField(ACard.class))[0]);
         }
         return cards;
     }
 
     @Override
     public void startNextRound() throws InterruptedException {
-        String currentPlayer = playerNames.get(0);
+        String currentPlayer = currentPlayer();
 
         var nextPlayerNoTokenMessage = new NextPlayerCommand(currentPlayer);
 
         // Inform all that new turn has begun
         for (var player : players.values()){
             if(player.getPlayerName().equals(currentPlayer)) {
-                player.getPlayerInbox().put(new NextPlayerCommand("TurnToken", currentPlayer));
+                player.getPlayerInbox().put(new NextPlayerCommand("turnToken", currentPlayer).getFields());
             } else {
-                player.getPlayerInbox().put(nextPlayerNoTokenMessage);
+                player.getPlayerInbox().put(nextPlayerNoTokenMessage.getFields());
             }
         }
 
@@ -111,7 +111,7 @@ public class Game implements IGame {
         do {
             //send current game state to all
             for(IPlayerConnection player : players.values()){
-                player.getPlayerInbox().put(new NewGameStateMessage(gameState));
+                player.getPlayerInbox().put(new NewGameStateMessage(gameState).getFields());
             }
             
             var fields = inbox.get(IMessage.getGeneralTemplate().getFields());
@@ -129,7 +129,7 @@ public class Game implements IGame {
                     playerConnection.put(
                         new DrawCardsCommand(
                             drawnCards, 
-                            "You were called out for forgetting to say Uno!"));
+                            "You were called out for forgetting to say Uno!").getFields());
 
                 } 
 
@@ -139,7 +139,7 @@ public class Game implements IGame {
                         .append(correctObjection ? "correctly" : "incorrectly");
 
                     player.getPlayerInbox()
-                        .put(new UpdateMessage(text.toString()));
+                        .put(new UpdateMessage(text.toString()).getFields());
                 }
                 
             } else if(message instanceof DrawCardsCommand) {
@@ -161,7 +161,7 @@ public class Game implements IGame {
                 players
                     .get(currentPlayer)
                     .getPlayerInbox()
-                    .put(new DrawCardsCommand(drawnCards, reason));
+                    .put(new DrawCardsCommand(drawnCards, reason).getFields());
                 
                 playersHandSize.compute(currentPlayer, (key, value) -> value + drawnCards.length);
             } else if(message instanceof PlayCardsCommand) {
@@ -246,7 +246,7 @@ public class Game implements IGame {
         //Put first can on discardPile
         do {
             try {
-                ACard[] fstCard = draw(1);
+                Card[] fstCard = draw(1);
                 discardPile.push(fstCard[0]);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -257,15 +257,16 @@ public class Game implements IGame {
         //send to 7 cards to each player
         for(IPlayerConnection player : players.values()){
             try {
-                ACard[] hand = draw(7);
+                Card[] hand = draw(7);
                 playersHandSize.put(player.getPlayerName(), 7);
-                player.getPlayerInbox().put(new DrawCardsCommand(hand, "Getting Starting Hand"));
+                player.getPlayerInbox().put(new DrawCardsCommand(hand, "Getting Starting Hand").getFields());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         gameState.currentPlayerName = new PlayerState(playerNames.get(0), 7); 
+        gameState.topCard = discardPile.peek();
         updateStateTurnOrder();
     }
     
@@ -298,7 +299,7 @@ public class Game implements IGame {
     }
 
     private void updateStateTurnOrder() {
-        if (gameState.turnOrder.length < playerNames.size()) {
+        if (gameState.turnOrder == null || gameState.turnOrder.length < playerNames.size()) {
             gameState.turnOrder = new PlayerState[playersHandSize.size()];
         }
 

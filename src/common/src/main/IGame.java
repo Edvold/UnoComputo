@@ -8,7 +8,7 @@ import org.jspace.Space;
 interface IGame {
 
     Space deck = new RandomSpace();
-    Stack<ACard> discardPile = new Stack<>();
+    Stack<Card> discardPile = new Stack<>();
 
     void startGame();
     void generateDeck();
