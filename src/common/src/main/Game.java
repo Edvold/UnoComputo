@@ -23,6 +23,7 @@ public class Game implements IGame {
     private Space inbox;
     private ArrayList<String> playerNames;
     private Map<String, Integer> playersHandSize;
+    private GameState gameState;
 
 
     public Game(Map<String, IPlayerConnection> players, Space inbox) {
@@ -115,7 +116,6 @@ public class Game implements IGame {
 
     public boolean isObjectionCorrect() {
 
-        GameState gameState = new GameState(); // Get actual gamestate
         String lastPlayerName = playerNames.get(playerNames.size()-1);
 
         PlayerState lastPlayer = null;

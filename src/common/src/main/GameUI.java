@@ -6,9 +6,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.jspace.FormalField;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.MessageFactory;
+import common.src.main.Messages.PlayerMessage;
 import common.src.main.Messages.UIMessage;
 import common.src.main.Messages.UpdateMessage;
 
@@ -35,12 +37,8 @@ public class GameUI implements Runnable {
 
             while (true) {
 
-                // Get message from player
-                // How to differentiate between two message types? PlayerMessage & UpdateMessage
-                // Want to get on PlayerMessage and getp on UpdateMessage
-                var message = inbox.get(IStateMessage.getGeneralTemplate().getFields());
-                
-                GameStateUpdate gsu = (GameStateUpdate)((IStateMessage<GameStateUpdate>) MessageFactory.create(message)).getState();
+                GameStateUpdate gsu = (GameStateUpdate)inbox.get(new FormalField(MessageType.PlayerMessage.getClass()), new FormalField(Object.class), new FormalField(String.class))[1];
+
                 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
                 ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
@@ -48,10 +46,16 @@ public class GameUI implements Runnable {
                 gameState = gsu.gameState;
                 
                 
-
+                
                 // Print the current state of the game
                 printOverview(gameState);
                 
+                // Get and print update message if any exists
+                var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class), new FormalField(String.class));
+                if (message != null) {
+                    printUpdateMessage((String)message[2]);
+                }
+
                 takeTurn(possibleCards, hand, possibleActions);
             }
 
@@ -59,6 +63,13 @@ public class GameUI implements Runnable {
             e.printStackTrace();
         }
         
+    }
+
+    private void printUpdateMessage(String message) {
+        System.out.println("===========================================");
+        System.out.println("UPDATE FROM GAME:");
+        System.out.println(message);
+        System.out.println("===========================================");
     }
 
     private void printOverview(GameState gameState) {

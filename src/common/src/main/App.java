@@ -15,6 +15,7 @@ import org.jspace.SpaceRepository;
 
 import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.PlayerMessage;
+import common.src.main.Messages.UpdateMessage;
 
 
 public class App {
@@ -41,7 +42,7 @@ public class App {
 		
 		Card tc = new Card(Color.GREEN, Action.FOUR);
 		
-		GameState gs = new GameState(ps, tc, turnOrder, 0);
+		GameState gs = new GameState(ps, tc, turnOrder, 0, false);
 
 
 		ACard card1 = new Card(Color.GREEN, Action.TWO);
@@ -66,7 +67,9 @@ public class App {
 		uithread.start();
 
 		var message = new PlayerMessage(gs, (Card[]) possibleCards.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]), (PlayerAction[]) pas.toArray(new PlayerAction[0]));
+		var message2 = new UpdateMessage("somebody objected");
 		outbox.put(message.getFields());
+		outbox.put(message2.getFields());
 	}
 
 }
