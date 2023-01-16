@@ -81,7 +81,16 @@ public class Player implements IPlayer {
                                 gameSpace.put(new CallOutCommand(playerName).getFields());
                                 break;
                             case PLAY:
-                                Card playedCard = hand.get(Integer.parseInt((String) newMessage[2]));
+
+                                String[] cardValues = ((String)newMessage[2]).split(" ");
+
+                                Card playedCard = hand.get(Integer.parseInt(cardValues[1]));
+
+                                
+                                if (cardValues.length == 2) {
+                                    playedCard.setColor(Color.valueOf(cardValues[2]));
+                                }
+
                                 gameState.topCard = (Card) playedCard;
                                 playedFirstCard = true;
                                 if (playedCard.getAction().equals(Action.DRAW2)

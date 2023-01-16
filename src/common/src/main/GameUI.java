@@ -24,7 +24,7 @@ public class GameUI implements Runnable {
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
     BufferedReader reader = new BufferedReader((new InputStreamReader(System.in)));
-    Thread objectCheckerThread;
+    Thread objectCheckerThread = new Thread();
     ObjectChecker objectChecker;
 
 
@@ -46,9 +46,7 @@ public class GameUI implements Runnable {
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
                 ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
                 ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(gsu.possibleActions));
-                gameState = gsu.gameState;
-                
-                
+                gameState = gsu.gameState;                
                 
                 // Print the current state of the game
                 printOverview();
@@ -67,7 +65,6 @@ public class GameUI implements Runnable {
                 } else {
                     if (objectCheckerThread.isAlive()) {
                         objectChecker.stop();
-
                         objectCheckerThread.interrupt();
                     }
                     takeTurn(possibleCards, hand, possibleActions);
@@ -186,13 +183,47 @@ public class GameUI implements Runnable {
                     System.out.println("That is not a valid card.");
                     continue;
                 }
+
+
+                Color color = null;
+
+                if (hand.get(card).getColor() == Color.BLACK) {
+                    System.out.println("Choose a color:");
+                    System.out.println("1. " + Color.BLUE);
+                    System.out.println("2. " + Color.RED);
+                    System.out.println("3. " + Color.GREEN);
+                    System.out.println("4. " + Color.YELLOW);
+                }
+
+                int index = Integer.parseInt(reader.readLine());
+
+                if (index > 4 || index < 1) {
+                    clearScreen();
+                    System.out.println("That is not a valid color");
+                    continue;
+                }
+
+                switch (index) {
+                    case 1:
+                        color = Color.BLUE;
+                        break;
+                    case 2:
+                        color = Color.RED;
+                        break;
+                    case 3:
+                        color = Color.GREEN;
+                        break;
+                    case 4:
+                        color = Color.YELLOW;
+                        break;
+                }
                 
                 clearScreen();
 
                 getChoice = false;
 
                 // Inform player of choice
-                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card)).getFields());
+                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card) + " " + color.toString()).getFields());
                 
             } catch (InterruptedException e) {
                 e.printStackTrace();
