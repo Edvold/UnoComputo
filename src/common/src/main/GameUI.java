@@ -125,15 +125,15 @@ public class GameUI implements Runnable {
                 // Get choice input from player
                 int option = Integer.parseInt(reader.readLine()) - 1;
                 
-                getChoice = false;
-
                 // Player choses a non-existing option
                 if (option >= possibleActions.size() || option < 0) {
-                System.out.println(wrongInput);
-                getChoice = true;
+                    System.out.println(wrongInput);
+                    continue;
                 }
-
+                
                 clearScreen();
+                
+                getChoice = false;
 
                 if (possibleActions.get(option) == PlayerAction.PLAY) {
                     playCard(hand, possibleCards);
@@ -221,7 +221,7 @@ public class GameUI implements Runnable {
                     }
                 }
                     
-                    clearScreen();
+                clearScreen();
                     
                 getChoice = false;
 
