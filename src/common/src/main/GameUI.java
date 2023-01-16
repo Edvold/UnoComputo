@@ -185,6 +185,8 @@ public class GameUI implements Runnable {
                 }
 
 
+                String returnMessage = String.valueOf(card);
+                
                 Color color = null;
 
                 if (hand.get(card).getColor() == Color.BLACK) {
@@ -194,7 +196,7 @@ public class GameUI implements Runnable {
                     System.out.println("3. " + Color.GREEN);
                     System.out.println("4. " + Color.YELLOW);
                 }
-
+                
                 int index = Integer.parseInt(reader.readLine());
 
                 if (index > 4 || index < 1) {
@@ -222,8 +224,10 @@ public class GameUI implements Runnable {
 
                 getChoice = false;
 
+                if (color != null) returnMessage +=  " " + color.toString().toUpperCase();
+
                 // Inform player of choice
-                outbox.put(new UIMessage(PlayerAction.PLAY, String.valueOf(card) + " " + color.toString()).getFields());
+                outbox.put(new UIMessage(PlayerAction.PLAY, returnMessage).getFields());
                 
             } catch (InterruptedException e) {
                 e.printStackTrace();
