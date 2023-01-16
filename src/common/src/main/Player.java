@@ -114,6 +114,7 @@ public class Player implements IPlayer {
                                 addToOutput(playedCard);
                                 hand.remove(index);
                                 gameState.currentPlayerName.handSize--;
+                                gameState.turnOrder[0].handSize--;
 
                                 if (!actions.contains(PlayerAction.ENDTURN))
                                     actions.add(PlayerAction.ENDTURN);
