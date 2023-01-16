@@ -183,7 +183,6 @@ class CallOutChecker implements Runnable {
                 checkingSpace.get(new ActualField(MessageType.UIMessage), new ActualField(PlayerAction.OBJECT),
                         new FormalField(String.class)); 
                 sendingSpace.put(new CallOutCommand(playerName).getFields());
-                return;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
