@@ -7,10 +7,6 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.jspace.RemoteSpace;
 import org.jspace.Space;
@@ -44,6 +40,7 @@ public final class Host implements Runnable {
     public void hostGame() {
         
         try {
+            ui.showMessage("Your ip is: " + ip);
             ui.showMessage("Now waiting for players to join...");
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
