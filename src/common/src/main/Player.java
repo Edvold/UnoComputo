@@ -84,11 +84,11 @@ public class Player implements IPlayer {
 
                                 String[] cardValues = ((String)newMessage[2]).split(" ");
 
-                                Card playedCard = hand.get(Integer.parseInt(cardValues[1]));
+                                Card playedCard = hand.get(Integer.parseInt(cardValues[0]));
 
                                 
                                 if (cardValues.length == 2) {
-                                    playedCard.setColor(Color.valueOf(cardValues[2]));
+                                    playedCard.setColor(Color.valueOf(cardValues[1]));
                                 }
 
                                 gameState.topCard = (Card) playedCard;
