@@ -16,9 +16,8 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
-
 public class GameUI implements Runnable {
-    
+
     Space outbox;
     Space inbox;
     GameState gameState;
@@ -28,7 +27,6 @@ public class GameUI implements Runnable {
     Thread objectCheckerThread = new Thread();
     ObjectChecker objectChecker;
 
-
     public GameUI(Space inbox, Space outbox, String name) {
         this.inbox = inbox;
         this.outbox = outbox;
@@ -36,26 +34,28 @@ public class GameUI implements Runnable {
     }
 
     public void run() {
-    
+
         try {
 
             while (true) {
 
-                GameStateUpdate gsu = (GameStateUpdate)inbox.get(new ActualField(MessageType.PlayerMessage), new FormalField(Object.class), new FormalField(String.class))[1];
+                GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
+                        new FormalField(Object.class), new FormalField(String.class))[1];
 
-                
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
-                ArrayList<Card> hand =  new ArrayList<Card>(Arrays.asList(gsu.hand));
-                ArrayList<PlayerAction> possibleActions =  new ArrayList<PlayerAction>(Arrays.asList(gsu.possibleActions));
-                gameState = gsu.gameState;                
-                
+                ArrayList<Card> hand = new ArrayList<Card>(Arrays.asList(gsu.hand));
+                ArrayList<PlayerAction> possibleActions = new ArrayList<PlayerAction>(
+                        Arrays.asList(gsu.possibleActions));
+                gameState = gsu.gameState;
+
                 // Print the current state of the game
                 printOverview();
-                
+
                 // Get and print update message if any exists
-                var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class), new FormalField(String.class));
+                var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
+                        new FormalField(String.class));
                 if (message != null) {
-                    printUpdateMessage((String)message[2]);
+                    printUpdateMessage((String) message[2]);
                 }
 
                 if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
@@ -75,7 +75,7 @@ public class GameUI implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
     }
 
     private void printUpdateMessage(String message) {
@@ -87,7 +87,8 @@ public class GameUI implements Runnable {
 
     private void printOverview() {
 
-        if (gameState.saidUNO) System.out.println(gameState.turnOrder[gameState.turnOrder.length-1].userName + "has said UNO!");
+        if (gameState.saidUNO)
+            System.out.println(gameState.turnOrder[gameState.turnOrder.length - 1].userName + "has said UNO!");
         System.out.println("A new round has begun!");
         System.out.println("The turn-order is:");
 
@@ -95,44 +96,46 @@ public class GameUI implements Runnable {
             System.out.println(player.toString());
         }
 
-        System.out.println("It is currently " + (gameState.currentPlayerName.userName.equals(userName) ? "your turn" : (gameState.currentPlayerName.userName + "'s turn")));
-        
+        System.out.println("It is currently " + (gameState.currentPlayerName.userName.equals(userName) ? "your turn"
+                : (gameState.currentPlayerName.userName + "'s turn")));
+
         printTopCard();
-        
+
         if (gameState.streak > 0) {
             System.out.println("There is currently a streak of " + gameState.streak);
         }
     }
 
-
-    private void takeTurn(ArrayList<Card> possibleCards, ArrayList<Card> hand, ArrayList<PlayerAction> possibleActions) {
+    private void takeTurn(ArrayList<Card> possibleCards, ArrayList<Card> hand,
+            ArrayList<PlayerAction> possibleActions) {
 
         boolean getChoice = true;
 
         while (getChoice) {
 
             try {
-                
-                if (possibleActions.contains(PlayerAction.PLAY)) printHand(hand);
-                
+
+                if (possibleActions.contains(PlayerAction.PLAY))
+                    printHand(hand);
+
                 System.out.println("Choose an option:");
-                
+
                 for (int i = 1; i <= possibleActions.size(); i++) {
-                    PlayerAction pa = possibleActions.get(i-1);
+                    PlayerAction pa = possibleActions.get(i - 1);
                     System.out.println(i + ". " + pa.toString());
                 }
-                
+
                 // Get choice input from player
                 int option = Integer.parseInt(reader.readLine()) - 1;
-                
+
                 // Player choses a non-existing option
                 if (option >= possibleActions.size() || option < 0) {
                     System.out.println(wrongInput);
                     continue;
                 }
-                
+
                 clearScreen();
-                
+
                 getChoice = false;
 
                 if (possibleActions.get(option) == PlayerAction.PLAY) {
@@ -151,14 +154,14 @@ public class GameUI implements Runnable {
                 System.out.println(wrongInput);
             } catch (IOException e) {
                 e.printStackTrace();
-            }        
+            }
         }
     }
 
     private void playCard(ArrayList<Card> hand, ArrayList<Card> possibleCards) {
-        
+
         boolean getChoice = true;
-        
+
         while (getChoice) {
 
             try {
@@ -169,15 +172,15 @@ public class GameUI implements Runnable {
                 System.out.println("Choose a card to play");
 
                 // Get choice input from player
-                int card = Integer.parseInt(reader.readLine())-1;
-                
+                int card = Integer.parseInt(reader.readLine()) - 1;
+
                 // Player chooses non-existing card
                 if (card >= hand.size() || card < 0) {
                     clearScreen();
                     System.out.println(wrongInput);
                     continue;
                 }
-                
+
                 // Player chooses a card that is impossible to play (according to rules)
                 if (!possibleCards.contains(hand.get(card))) {
                     clearScreen();
@@ -185,9 +188,8 @@ public class GameUI implements Runnable {
                     continue;
                 }
 
-
                 String returnMessage = String.valueOf(card);
-                
+
                 Color color = null;
 
                 if (hand.get(card).getColor() == Color.BLACK) {
@@ -196,40 +198,41 @@ public class GameUI implements Runnable {
                     System.out.println("2. " + Color.RED);
                     System.out.println("3. " + Color.GREEN);
                     System.out.println("4. " + Color.YELLOW);
-                    
+
                     int index = Integer.parseInt(reader.readLine());
-                    
+
                     if (index > 4 || index < 1) {
                         clearScreen();
                         System.out.println("That is not a valid color");
                         continue;
                     }
-                    
+
                     switch (index) {
                         case 1:
-                        color = Color.BLUE;
-                        break;
+                            color = Color.BLUE;
+                            break;
                         case 2:
-                        color = Color.RED;
-                        break;
+                            color = Color.RED;
+                            break;
                         case 3:
-                        color = Color.GREEN;
-                        break;
+                            color = Color.GREEN;
+                            break;
                         case 4:
-                        color = Color.YELLOW;
-                        break;
+                            color = Color.YELLOW;
+                            break;
                     }
                 }
-                    
+
                 clearScreen();
-                    
+
                 getChoice = false;
 
-                if (color != null) returnMessage +=  " " + color.toString().toUpperCase();
+                if (color != null)
+                    returnMessage += " " + color.toString().toUpperCase();
 
                 // Inform player of choice
                 outbox.put(new UIMessage(PlayerAction.PLAY, returnMessage).getFields());
-                
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (NumberFormatException e) {
@@ -240,7 +243,6 @@ public class GameUI implements Runnable {
             }
         }
     }
-
 
     private void printHand(ArrayList<Card> hand) {
         int counter = 1;
@@ -265,7 +267,6 @@ class ObjectChecker implements Runnable {
     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private final Space outbox;
 
-
     public ObjectChecker(Space outbox) {
         this.outbox = outbox;
     }
@@ -274,37 +275,34 @@ class ObjectChecker implements Runnable {
     public void run() {
         System.out.println("You can choose to");
         System.out.println("1. " + PlayerAction.OBJECT);
-            try {
-                String input = reader.readLine();
-                if (input.equals("1")) {
-                    System.out.println("Got input");
-                    outbox.put(new UIMessage(PlayerAction.OBJECT, "").getFields());
-                }
+        try {
+            String input = reader.readLine();
+            if (input.equals("1")) {
+                System.out.println("Got input");
+                outbox.put(new UIMessage(PlayerAction.OBJECT, "").getFields());
+            }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        
-        
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     public void stop() {
-        // try {
-        //     // Can't interrupt reader.readLine()
-        //     // It will keep waiting for input even though we interrupt the thread
-        //     // So a simulation of a press of enter is needed to end the read 
-        //     Robot robot = new Robot();
-        //     robot.keyPress(KeyEvent.VK_ENTER);
-        // } catch (AWTException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
+        try {
+            // Can't interrupt reader.readLine()
+            // It will keep waiting for input even though we interrupt the thread
+            // So a simulation of a press of enter is needed to end the read
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_ENTER);
+        } catch (AWTException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
-    
 
 }
