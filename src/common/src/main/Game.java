@@ -182,6 +182,7 @@ public class Game implements IGame {
                 for (Card card : playedCards) {
                     discardPile.add(card);
                 }
+                playersHandSize.compute(currentPlayer, (key, value) -> value - playedCards.length);
                 gameState.topCard = (Card)discardPile.peek();
                 gameState.saidUNO = playCommand.didSayUno();
             } else {
