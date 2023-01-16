@@ -74,11 +74,13 @@ public class Player implements IPlayer {
                     sendNewGameState = true;
 
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
-
+                    
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
+                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.Update) {
                         UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
+                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.UIMessage) {
                         PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
