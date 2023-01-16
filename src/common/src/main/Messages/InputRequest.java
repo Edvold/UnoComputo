@@ -9,7 +9,7 @@ import common.src.main.IMessage;
 
 public final class InputRequest extends AStateMessage<IMessage> {
     public InputRequest(IMessage message) {
-        this(message, "InputResonse-Thread:" + Thread.currentThread().threadId());
+        this(message, "InputResonse-Thread:" + Thread.currentThread().getId());
     }
 
     InputRequest(IMessage message, String responseTag) {
