@@ -4,7 +4,7 @@ import static common.src.main.MessageType.NextPlayerCommand;;
 
 public final class NextPlayerCommand extends AStateMessage<String> {
     public NextPlayerCommand(String player) {
-        this(null, player);
+        this("", player);
     }
 
     public NextPlayerCommand(String turnToken, String player) {

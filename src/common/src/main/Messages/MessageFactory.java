@@ -2,10 +2,9 @@ package common.src.main.Messages;
 
 import java.util.List;
 
-import common.src.main.ACard;
+import common.src.main.Card;
 import common.src.main.GameState;
 import common.src.main.IMessage;
-import common.src.main.IStateMessage;
 import common.src.main.MessageType;
 import common.src.main.PlayerAction;
 
@@ -15,8 +14,8 @@ public class MessageFactory {
     public static IMessage create(Object[] fields) {
         return switch ((MessageType) fields[0]) {
             case NextPlayerCommand -> new NextPlayerCommand((String) fields[1], (String) fields[2]); 
-            case PlayCardsCommand -> new PlayCardsCommand((String) fields[2], (List<ACard>)fields[2]); 
-            case DrawCardsCommand -> new DrawCardsCommand((String) fields[2]); 
+            case PlayCardsCommand -> new PlayCardsCommand((String) fields[2], (List<Card>)fields[1]); 
+            case DrawCardsCommand -> new DrawCardsCommand((Card[])fields[1], (String) fields[2]); 
             case CallOutCommand -> new CallOutCommand((String) fields[2]); 
             case Update -> new UpdateMessage((String) fields[2]); 
             case NewGameState -> new NewGameStateMessage((GameState)fields[1], (String) fields[2]); 
