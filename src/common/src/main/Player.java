@@ -99,6 +99,7 @@ public class Player implements IPlayer {
                                 break;
                             case OBJECT:
                                 gameSpace.put(new CallOutCommand(playerName).getFields());
+                                sendNewGameState = false;
                                 break;
                             case PLAY:
 
