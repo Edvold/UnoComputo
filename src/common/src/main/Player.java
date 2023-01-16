@@ -43,10 +43,10 @@ public class Player implements IPlayer {
         while (true) {
             playedFirstCard = false;
             var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
-            new FormalField(Object.class), new FormalField(String.class));
+                    new FormalField(Object.class), new FormalField(String.class));
 
-            if(gameOverMessage != null) {
-                UISpace.put(new UpdateMessage((String)gameOverMessage[2]));
+            if (gameOverMessage != null) {
+                UISpace.put(new UpdateMessage((String) gameOverMessage[2]));
                 return;
             }
 
@@ -62,13 +62,13 @@ public class Player implements IPlayer {
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
                             : getPlayableCards(hand, gameState.topCard);
-                    
+
                     if (playables.size() == 0) {
                         actions.remove(PlayerAction.PLAY);
                     }
 
                     UISpace.put(new PlayerMessage(gameState, playables.toArray(new Card[0]), hand.toArray(new Card[0]),
-                            (PlayerAction[])actions.toArray(new PlayerAction[0])).getFields()); // message?
+                            (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields()); // message?
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
@@ -96,12 +96,11 @@ public class Player implements IPlayer {
                                 break;
                             case PLAY:
 
-                                String[] cardValues = ((String)newMessage[2]).split(" ");
+                                String[] cardValues = ((String) newMessage[2]).split(" ");
 
                                 int index = Integer.parseInt(cardValues[0]);
                                 Card playedCard = hand.get(index);
 
-                                
                                 if (cardValues.length == 2) {
                                     playedCard.setColor(Color.valueOf(cardValues[1]));
                                 }
@@ -114,9 +113,12 @@ public class Player implements IPlayer {
                                 }
                                 addToOutput(playedCard);
                                 hand.remove(index);
+                                gameState.currentPlayerName.handSize--;
 
-                                if (!actions.contains(PlayerAction.ENDTURN)) actions.add(PlayerAction.ENDTURN);
-                                if (actions.contains(PlayerAction.DRAW)) actions.remove(PlayerAction.DRAW);
+                                if (!actions.contains(PlayerAction.ENDTURN))
+                                    actions.add(PlayerAction.ENDTURN);
+                                if (actions.contains(PlayerAction.DRAW))
+                                    actions.remove(PlayerAction.DRAW);
                                 break;
                         }
                     }
@@ -127,11 +129,12 @@ public class Player implements IPlayer {
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
                 }
-                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]), (PlayerAction[])actions.toArray(new PlayerAction[0])).getFields());
+                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
+                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
             }
         }
     }
-   
+
     @Override
     public void addToOutput(Card card) {
         output.add(card);
@@ -211,7 +214,7 @@ class CallOutChecker implements Runnable {
         try {
             while (true) {
                 checkingSpace.get(new ActualField(MessageType.UIMessage), new ActualField(PlayerAction.OBJECT),
-                        new FormalField(String.class)); 
+                        new FormalField(String.class));
                 sendingSpace.put(new CallOutCommand(playerName).getFields());
             }
         } catch (InterruptedException e) {
