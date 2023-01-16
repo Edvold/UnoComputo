@@ -15,12 +15,12 @@ public class GameState {
         streak = 0;
         saidUNO = false;
     }
-    public GameState (PlayerState currentPlayerName, Card topCard, PlayerState[] turnOrder, int streak, boolean saidUno){
+    public GameState (PlayerState currentPlayerName, Card topCard, PlayerState[] turnOrder, int streak, boolean saidUNO){
         this.currentPlayerName = currentPlayerName;
         this.topCard = topCard;
         this.turnOrder = turnOrder;
         this.streak = streak;
-        this.saidUNO = saidUno;
+        this.saidUNO = saidUNO;
     }
 
     public static class PlayerState {
