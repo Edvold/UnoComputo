@@ -108,6 +108,7 @@ public class Player implements IPlayer {
                                 hand.remove(index);
 
                                 if (!actions.contains(PlayerAction.ENDTURN)) actions.add(PlayerAction.ENDTURN);
+                                if (actions.contains(PlayerAction.DRAW)) actions.remove(PlayerAction.DRAW);
                                 break;
                         }
                     }
