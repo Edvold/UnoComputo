@@ -10,11 +10,8 @@ import org.jspace.Space;
 import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.MessageFactory;
-import common.src.main.Messages.NewGameStateMessage;
-import common.src.main.Messages.NextPlayerCommand;
 import common.src.main.Messages.PlayCardsCommand;
 import common.src.main.Messages.PlayerMessage;
-import common.src.main.Messages.UIMessage;
 import common.src.main.Messages.UpdateMessage;
 
 public class Player implements IPlayer {
@@ -45,27 +42,24 @@ public class Player implements IPlayer {
         String token = "";
         while (true) {
             playedFirstCard = false;
-            NextPlayerCommand turnMessage = (NextPlayerCommand) gameSpace.get(new FormalField(NextPlayerCommand.class))[0];
-            this.gameState = ((NewGameStateMessage) gameSpace.get(new FormalField(NewGameStateMessage.class))[0]).getState();
-            token = turnMessage.getState();
+            var turnMessage = gameSpace.get(new ActualField(MessageType.NextPlayerCommand.getClass()), new FormalField(String.class), new FormalField(String.class));
+            this.gameState = ((GameState) gameSpace.get(new ActualField(MessageType.NewGameState.getClass()), new FormalField(GameState.class), new FormalField(String.class))[1]);
+            token = (String) turnMessage[1];
             if (token.equals("turnToken")) {
             // It is your turn
-                computeActions(token);
+                computeInitialActions(token);
                 while (token.equals("turnToken")) {
-                    ArrayList<ACard> playables = playedFirstCard ? getStackingCards(hand, gameState.topCard) : getPlayableCards(hand, gameState.topCard);
+                    ArrayList<ACard> playables = playedFirstCard || gameState.streak > 0 ? getStackingCards(hand, gameState.topCard) : getPlayableCards(hand, gameState.topCard);
                     UISpace.put(new PlayerMessage(gameState, (Card[]) playables.toArray(), (Card[]) hand.toArray(), actions)); //message?
-                    IMessage newMessage = (IMessage) playerInbox.get(new FormalField(IMessage.class))[0];
-                    if(newMessage.getMessageType() == MessageType.CallOutCommand){
-                        CallOutCommand message = (CallOutCommand) newMessage;
-                        UISpace.put(new UpdateMessage("There has been an objection by " + message.getMessageText()));
+                    var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
+                    if(newMessage[0] == MessageType.CallOutCommand){
+                        UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]));
                     }
-                    else if (newMessage.getMessageType() == MessageType.Update){
-                        UpdateMessage message = (UpdateMessage) newMessage;
-                        UISpace.put(message);
+                    else if (newMessage[0] == MessageType.Update){
+                        UISpace.put(new UpdateMessage((String) newMessage[1]));
                     }
-                    else if (newMessage.getMessageType() == MessageType.UIMessage){
-                        UIMessage message = (UIMessage) newMessage;
-                        PlayerAction action = message.getState();
+                    else if (newMessage[0] == MessageType.UIMessage){
+                        PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
                             case DRAW: String reason = gameState.streak > 0 ? "Streak" : "Draw";
                                 gameSpace.put(new DrawCardsCommand(reason));
@@ -79,7 +73,7 @@ public class Player implements IPlayer {
                                     break;
                             case OBJECT: gameSpace.put(new CallOutCommand(playerName));
                                     break;
-                            case PLAY: ACard playedCard = hand.get(Integer.parseInt(message.getMessageText()));
+                            case PLAY: ACard playedCard = hand.get(Integer.parseInt((String) newMessage[2]));
                                     gameState.topCard = (Card) playedCard;
                                     playedFirstCard = true;
                                     if (playedCard.getAction().equals(Action.DRAW2) || playedCard.getAction().equals(Action.WILDDRAW4)){
@@ -94,7 +88,7 @@ public class Player implements IPlayer {
             }
         }
             else {
-                computeActions(token);
+                computeInitialActions(token);
                 // It is not your turn
                 if(!callOutCheckerThread.isAlive()){
                     callOutCheckerThread.start();
@@ -102,11 +96,6 @@ public class Player implements IPlayer {
                 UISpace.put(new PlayerMessage(gameState, new Card[0], (Card[]) hand.toArray(), actions));
         }
         }
-    }
-        
-
-    public void sendMessage(){ // not done
-        //create body
     }
 
     @Override
@@ -140,17 +129,9 @@ public class Player implements IPlayer {
 
     //getters and setters
 
-    public ArrayList<ACard> getHand() {
-        return hand;
-    }
-
     public void setHand(ArrayList<ACard> newHand) {
         hand = newHand;
-    }
-
-    // public void setGameState(GameState gameState){
-    //     this.gameState = gameState;
-    // }    
+    }    
 
     private void getDrawnCards() throws InterruptedException {
         var template = new DrawCardsCommand().getTemplateBuilder()
@@ -164,14 +145,9 @@ public class Player implements IPlayer {
         this.hand.addAll(newCards);
     } 
 
-    public void computeActions(String token) {
+    public void computeInitialActions(String token) {
         if (token.equals("turnToken")){
-            if(gameState.streak > 0){
-                actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.OBJECT,PlayerAction.UNO};
-            }
-            else{
-                actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.ENDTURN,PlayerAction.OBJECT,PlayerAction.UNO};
-            }
+            actions = new PlayerAction[] {PlayerAction.PLAY,PlayerAction.DRAW,PlayerAction.OBJECT,PlayerAction.UNO};
         }
         else {
             actions = new PlayerAction[] {PlayerAction.OBJECT};
@@ -195,7 +171,7 @@ class CallOutChecker implements Runnable {
     public void run() {
         try {
             while(true){
-                checkingSpace.get(new ActualField(PlayerAction.OBJECT), new FormalField(Integer.class)); //change to correct format
+                checkingSpace.get(new ActualField(MessageType.UIMessage.getClass()), new ActualField(PlayerAction.OBJECT.getClass()), new FormalField(String.class));
                 sendingSpace.put(new CallOutCommand(playerName));
                 return;
             }
