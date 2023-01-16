@@ -38,7 +38,7 @@ public class GameUI implements Runnable {
         try {
 
             while (true) {
-
+                
                 GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
                         new FormalField(Object.class), new FormalField(String.class))[1];
 
@@ -54,7 +54,7 @@ public class GameUI implements Runnable {
                 // Get and print update message if any exists
                 var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
                         new FormalField(String.class));
-                if (message != null) {
+                if (message != null || !((String)message[2]).equals("")) {
                     printUpdateMessage((String) message[2]);
                 }
 
@@ -285,7 +285,6 @@ class ObjectChecker implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -299,7 +298,6 @@ class ObjectChecker implements Runnable {
             Robot robot = new Robot();
             robot.keyPress(KeyEvent.VK_ENTER);
         } catch (AWTException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
