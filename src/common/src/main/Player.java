@@ -25,7 +25,7 @@ public class Player implements IPlayer {
     private Space gameSpace;
     private boolean saidUNO = false;
     private Thread callOutCheckerThread;
-    private PlayerAction[] actions;
+    private ArrayList<PlayerAction> actions;
     private boolean playedFirstCard;
 
     public Player(String name, Space gameSpace, Space UISpace, Space playerInbox) {
@@ -54,8 +54,13 @@ public class Player implements IPlayer {
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
                             : getPlayableCards(hand, gameState.topCard);
+                    
+                    if (playables.size() == 0) {
+                        actions.remove(PlayerAction.PLAY);
+                    }
+
                     UISpace.put(new PlayerMessage(gameState, playables.toArray(new Card[playables.size()]), hand.toArray(new Card[hand.size()]),
-                            actions).getFields()); // message?
+                            (PlayerAction[])actions.toArray()).getFields()); // message?
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
@@ -84,7 +89,8 @@ public class Player implements IPlayer {
 
                                 String[] cardValues = ((String)newMessage[2]).split(" ");
 
-                                Card playedCard = hand.get(Integer.parseInt(cardValues[0]));
+                                int index = Integer.parseInt(cardValues[0]);
+                                Card playedCard = hand.get(index);
 
                                 
                                 if (cardValues.length == 2) {
@@ -98,9 +104,9 @@ public class Player implements IPlayer {
                                     gameState.streak++;
                                 }
                                 addToOutput(playedCard);
-                                hand.remove(playedCard);
-                                actions = new PlayerAction[] { PlayerAction.PLAY, PlayerAction.UNO, PlayerAction.OBJECT,
-                                        PlayerAction.ENDTURN };
+                                hand.remove(index);
+
+                                if (!actions.contains(PlayerAction.ENDTURN)) actions.add(PlayerAction.ENDTURN);
                                 break;
                         }
                     }
@@ -111,7 +117,7 @@ public class Player implements IPlayer {
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
                 }
-                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]), actions).getFields());
+                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]), (PlayerAction[])actions.toArray()).getFields());
             }
         }
     }
@@ -165,11 +171,16 @@ public class Player implements IPlayer {
     }
 
     public void computeInitialActions(String token) {
+
+        actions = new ArrayList<>();
+
         if (token.equals("turnToken")) {
-            actions = new PlayerAction[] { PlayerAction.PLAY, PlayerAction.DRAW, PlayerAction.OBJECT,
-                    PlayerAction.UNO };
+            actions.add(PlayerAction.PLAY);
+            actions.add(PlayerAction.DRAW);
+            actions.add(PlayerAction.OBJECT);
+            actions.add(PlayerAction.UNO);
         } else {
-            actions = new PlayerAction[] { PlayerAction.OBJECT };
+            actions.add(PlayerAction.OBJECT);
         }
     }
 
