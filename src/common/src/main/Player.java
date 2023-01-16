@@ -60,7 +60,7 @@ public class Player implements IPlayer {
                     }
 
                     UISpace.put(new PlayerMessage(gameState, playables.toArray(new Card[playables.size()]), hand.toArray(new Card[hand.size()]),
-                            (PlayerAction[])actions.toArray()).getFields()); // message?
+                            (PlayerAction[])actions.toArray(new PlayerAction[0])).getFields()); // message?
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
@@ -118,7 +118,7 @@ public class Player implements IPlayer {
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
                 }
-                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]), (PlayerAction[])actions.toArray()).getFields());
+                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]), (PlayerAction[])actions.toArray(new PlayerAction[0])).getFields());
             }
         }
     }
