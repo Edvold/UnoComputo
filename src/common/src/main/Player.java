@@ -78,6 +78,7 @@ public class Player implements IPlayer {
                             case ENDTURN:
                                 gameSpace.put(new PlayCardsCommand(saidUNO, output).getFields());
                                 token = "";
+                                output.clear();
                                 break;
                             case UNO:
                                 saidUNO = true;
