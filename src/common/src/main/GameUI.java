@@ -89,8 +89,7 @@ public class GameUI implements Runnable {
 
     private void printOverview() {
 
-        if (gameState.saidUNO) System.out.println(getLastPlayerName() + "has said UNO!");
-
+        if (gameState.saidUNO) System.out.println(gameState.turnOrder[gameState.turnOrder.length-1].userName + "has said UNO!");
         System.out.println("A new round has begun!");
         System.out.println("The turn-order is:");
 
@@ -107,13 +106,6 @@ public class GameUI implements Runnable {
         }
     }
 
-    private String getLastPlayerName() {
-        int index = 0;
-        for (int i = 0; i < gameState.turnOrder.length; i++) {
-            if (gameState.turnOrder[i] == gameState.currentPlayerName) index = i-1;
-        }
-        return gameState.turnOrder[index].userName;
-    }
 
     private void takeTurn(ArrayList<Card> possibleCards, ArrayList<Card> hand, ArrayList<PlayerAction> possibleActions) {
 
