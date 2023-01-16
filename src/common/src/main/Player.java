@@ -91,7 +91,7 @@ public class Player implements IPlayer {
                                     playedCard.setColor(Color.valueOf(cardValues[1]));
                                 }
 
-                                gameState.topCard = (Card) playedCard;
+                                gameState.topCard = playedCard;
                                 playedFirstCard = true;
                                 if (playedCard.getAction().equals(Action.DRAW2)
                                         || playedCard.getAction().equals(Action.WILDDRAW4)) {

@@ -196,33 +196,33 @@ public class GameUI implements Runnable {
                     System.out.println("2. " + Color.RED);
                     System.out.println("3. " + Color.GREEN);
                     System.out.println("4. " + Color.YELLOW);
-                }
-                
-                int index = Integer.parseInt(reader.readLine());
-
-                if (index > 4 || index < 1) {
-                    clearScreen();
-                    System.out.println("That is not a valid color");
-                    continue;
-                }
-
-                switch (index) {
-                    case 1:
+                    
+                    int index = Integer.parseInt(reader.readLine());
+                    
+                    if (index > 4 || index < 1) {
+                        clearScreen();
+                        System.out.println("That is not a valid color");
+                        continue;
+                    }
+                    
+                    switch (index) {
+                        case 1:
                         color = Color.BLUE;
                         break;
-                    case 2:
+                        case 2:
                         color = Color.RED;
                         break;
-                    case 3:
+                        case 3:
                         color = Color.GREEN;
                         break;
-                    case 4:
+                        case 4:
                         color = Color.YELLOW;
                         break;
+                    }
                 }
-                
-                clearScreen();
-
+                    
+                    clearScreen();
+                    
                 getChoice = false;
 
                 if (color != null) returnMessage +=  " " + color.toString().toUpperCase();
