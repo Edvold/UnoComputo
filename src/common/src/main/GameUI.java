@@ -32,6 +32,7 @@ public class GameUI implements Runnable {
         this.inbox = inbox;
         this.outbox = outbox;
         userName = name;
+        objectCheckerThread.setDaemon(true);
     }
 
     public void run() {
@@ -262,7 +263,7 @@ public class GameUI implements Runnable {
     }
 
     private void printTopCard() {
-        System.out.println("The top card is: " + gameState.topCard);
+        System.out.println("The top card is: " + gameState.topCard.toString().toUpperCase());
     }
 
     private void clearScreen() {
@@ -305,6 +306,7 @@ class ObjectChecker implements Runnable {
             // So a simulation of a press of enter is needed to end the read
             Robot robot = new Robot();
             robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
         } catch (AWTException e) {
             e.printStackTrace();
         }
