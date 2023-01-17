@@ -69,6 +69,7 @@ public class GameUI implements Runnable {
                     if (objectCheckerThread.isAlive()) {
                     objectChecker.stop();
                     objectCheckerThread.interrupt();
+                    Thread.sleep(1000);
                     }
                     takeTurn(possibleCards, hand, possibleActions);
                 }
