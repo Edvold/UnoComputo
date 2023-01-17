@@ -186,10 +186,6 @@ public class Player implements IPlayer {
             } else {
                 computeInitialActions(token);
 
-                if (callOutChecker.hasObjected) {
-                    actions.remove(PlayerAction.OBJECT);
-                }
-
                 var newerStateList = playerInbox.getAll(
                         new ActualField(MessageType.NewGameState),
                         new FormalField(GameState.class), 
@@ -275,7 +271,7 @@ public class Player implements IPlayer {
             actions.add(PlayerAction.OBJECT);
             actions.add(PlayerAction.UNO);
         } else {
-            actions.add(PlayerAction.OBJECT);
+            if (!callOutChecker.hasObjected) actions.add(PlayerAction.OBJECT);
         }
     }
 
