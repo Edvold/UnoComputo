@@ -43,6 +43,7 @@ public class Player implements IPlayer {
     @Override
     public void run() throws InterruptedException {
         getDrawnCards(); // get initial hand
+        sortHand();
         String token = "";
         while (true) {
             playedFirstCard = false;
@@ -257,9 +258,9 @@ public class Player implements IPlayer {
         var response = playerInbox.get(template.getFields());
         var message = (DrawCardsCommand) MessageFactory.create(response);
 
-        var newCards = Arrays.asList(message.getState());
+        var newCards = message.getState();
 
-        this.hand.addAll(newCards);
+        insertIntoHand(newCards);
     }
 
     public void computeInitialActions(String token) {
@@ -275,6 +276,44 @@ public class Player implements IPlayer {
             if (!callOutChecker.hasObjected) actions.add(PlayerAction.OBJECT);
         }
     }
+
+    private void sortHand() {
+        ArrayList<Card> newHand = new ArrayList<>();
+
+        newHand.add(hand.get(0));
+
+        for (int i = 1; i < hand.size(); i++) {
+            int j = 0;
+            Card card = hand.get(i);
+
+            while(j != newHand.size() ) {
+                if (card.compareTo(newHand.get(j)) < 0) {
+                    break;
+                }
+                j++;
+            }
+            newHand.add(j, card);
+
+
+        }
+        hand = newHand;
+    }
+
+    private void insertIntoHand(Card... cards) {
+        for (int i = 0; i < cards.length; i++) {
+            int j = 0;
+            Card card = cards[i];
+
+            while(j != hand.size() ) {
+                if (card.compareTo(hand.get(j)) < 0) {
+                    break;
+                }
+                j++;
+            }
+            hand.add(j, card);
+        }
+    }
+
 
 }
 
