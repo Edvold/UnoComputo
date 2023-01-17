@@ -48,6 +48,14 @@ public class GameUI implements Runnable {
                 ArrayList<PlayerAction> possibleActions = new ArrayList<PlayerAction>(
                         Arrays.asList(gsu.possibleActions));
                 gameState = gsu.gameState;
+                
+                // Reset objectCheckerThread
+                if (objectCheckerThread.isAlive()) {
+                    objectChecker.stop();
+                    objectCheckerThread.interrupt();
+                    Thread.sleep(1000);
+                    }
+
 
                 // Print the current state of the game
                 printOverview();
@@ -66,11 +74,6 @@ public class GameUI implements Runnable {
                     objectCheckerThread.start();
 
                 } else {
-                    if (objectCheckerThread.isAlive()) {
-                    objectChecker.stop();
-                    objectCheckerThread.interrupt();
-                    Thread.sleep(1000);
-                    }
                     takeTurn(possibleCards, hand, possibleActions);
                 }
             }
