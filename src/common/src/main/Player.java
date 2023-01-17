@@ -88,6 +88,7 @@ public class Player implements IPlayer {
                         int handsize = hand.size();
                         this.gameState = (GameState) newMessage[1];
                         gameState.turnOrder[0].handSize = handsize;
+                        gameState.saidUNO = saidUNO;
                     } else if (newMessage[0] == MessageType.UIMessage) {
                         PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
