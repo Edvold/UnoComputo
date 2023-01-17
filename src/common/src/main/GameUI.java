@@ -172,6 +172,8 @@ public class GameUI implements Runnable {
                     possibleActions = new ArrayList<PlayerAction>(
                             Arrays.asList(gsu.possibleActions));
                     gameState = gsu.gameState;
+                    clearScreen();
+                    printOverview();
                 }
 
                 if (possibleActions.contains(PlayerAction.PLAY))
