@@ -9,6 +9,7 @@ import org.jspace.Space;
 
 import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
+import common.src.main.Messages.GenericMessage;
 import common.src.main.Messages.MessageFactory;
 import common.src.main.Messages.PlayCardsCommand;
 import common.src.main.Messages.PlayerMessage;
@@ -42,19 +43,20 @@ public class Player implements IPlayer {
         String token = "";
         while (true) {
             playedFirstCard = false;
-            var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
-                    new FormalField(Object.class), new FormalField(String.class));
-
-            if (gameOverMessage != null) {
-                UISpace.put(new UpdateMessage((String) gameOverMessage[2]));
-                return;
-            }
 
             var turnMessage = playerInbox.get(new ActualField(MessageType.NextPlayerCommand),
                     new FormalField(String.class), new FormalField(String.class));
             this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
                     new FormalField(GameState.class), new FormalField(String.class))[1]);
+            var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
+                    new FormalField(Object.class), new FormalField(String.class));
+        
             token = (String) turnMessage[1];
+
+            if(gameOverMessage != null) {
+                token = ""; //Game has ended noone has a turn
+            }
+
             if (token.equals("turnToken")) {
                 // It is your turn
                 computeInitialActions(token);
@@ -145,6 +147,11 @@ public class Player implements IPlayer {
                 }
                 UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
                         (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
+
+                if(gameOverMessage != null) {
+                    UISpace.put(new GenericMessage(MessageType.GameOver, (String)gameOverMessage[2]));
+                    return;
+                }
             }
         }
     }
