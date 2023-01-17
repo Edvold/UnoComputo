@@ -63,6 +63,7 @@ public class GameUI implements Runnable {
                 if (gameEndMessage != null) {
                     // Game has ended
                     end(gameEndMessage);
+                    break;
                 }
 
                 // Get and print update message if any exists
