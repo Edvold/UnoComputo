@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.jspace.ActualField;
 import org.jspace.FormalField;
@@ -52,10 +53,11 @@ public class GameUI implements Runnable {
                 printOverview();
 
                 // Get and print update message if any exists
-                var message = inbox.getp(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
+                var message = inbox.getAll(new FormalField(MessageType.Update.getClass()), new FormalField(Object.class),
                         new FormalField(String.class));
-                if (message != null && !((String) message[2]).equals("")) {
-                    printUpdateMessage((String) message[2]);
+                
+                if (message.size() > 0) {
+                    printUpdateMessage(message);
                 }
 
                 if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
@@ -78,10 +80,12 @@ public class GameUI implements Runnable {
 
     }
 
-    private void printUpdateMessage(String message) {
+    private void printUpdateMessage(List<Object[]> message) {
         System.out.println("===========================================");
         System.out.println("UPDATE FROM GAME:");
-        System.out.println(message);
+        for (Object[] messageArray : message) {
+            System.out.println((String)messageArray[2]);
+        }
         System.out.println("===========================================");
     }
 
