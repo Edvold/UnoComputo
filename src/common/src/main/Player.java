@@ -83,8 +83,10 @@ public class Player implements IPlayer {
                         UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
                         sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.NewGameState) {
+                        int handsize = hand.size();
                         this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
                         new FormalField(GameState.class), new FormalField(String.class))[1]);
+                        gameState.turnOrder[0].handSize = handsize;
                     } else if (newMessage[0] == MessageType.UIMessage) {
                         PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
