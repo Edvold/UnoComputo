@@ -6,8 +6,8 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
+import org.jspace.PileSpace;
 import org.jspace.RemoteSpace;
-import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
 
@@ -94,7 +94,7 @@ public class Client implements Runnable {
 
         ui.stop();
 
-        Space uiSpace = new SequentialSpace();
+        PileSpace uiSpace = new PileSpace();
         new Thread(new GameUI(uiSpace, playerInbox, name)).start();
         
         IPlayer player = new Player(name, lobbySpace, uiSpace, playerInbox);

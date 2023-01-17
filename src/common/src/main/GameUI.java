@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jspace.ActualField;
 import org.jspace.FormalField;
+import org.jspace.PileSpace;
 import org.jspace.Space;
 import common.src.main.GameState.PlayerState;
 import common.src.main.Messages.UIMessage;
@@ -20,7 +21,7 @@ import java.awt.event.KeyEvent;
 public class GameUI implements Runnable {
 
     Space outbox;
-    Space inbox;
+    PileSpace inbox;
     GameState gameState;
     String userName;
     final static String wrongInput = "Sorry that is not an option. Try again!";
@@ -28,7 +29,7 @@ public class GameUI implements Runnable {
     Thread objectCheckerThread = new Thread();
     ObjectChecker objectChecker;
 
-    public GameUI(Space inbox, Space outbox, String name) {
+    public GameUI(PileSpace inbox, Space outbox, String name) {
         this.inbox = inbox;
         this.outbox = outbox;
         userName = name;
@@ -43,23 +44,28 @@ public class GameUI implements Runnable {
 
                 GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
                         new FormalField(Object.class), new FormalField(String.class))[1];
+                
+                inbox.getAll(  //If any older states exits, throw them away
+                    new ActualField(MessageType.PlayerMessage), 
+                    new FormalField(Object.class), 
+                    new FormalField(String.class));
 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
                 ArrayList<Card> hand = new ArrayList<Card>(Arrays.asList(gsu.hand));
                 ArrayList<PlayerAction> possibleActions = new ArrayList<PlayerAction>(
                         Arrays.asList(gsu.possibleActions));
                 gameState = gsu.gameState;
-                
-                // Reset objectCheckerThread
-                stopObjectCheckerThread();                
 
+                // Reset objectCheckerThread
+                stopObjectCheckerThread();
 
                 // Print the current state of the game
                 printOverview();
 
                 // Has game ended?
-                var gameEndMessage = inbox.getp(new ActualField(MessageType.GameOver), new FormalField(Object.class), new FormalField(String.class));
-                
+                var gameEndMessage = inbox.getp(new ActualField(MessageType.GameOver), new FormalField(Object.class),
+                        new FormalField(String.class));
+
                 if (gameEndMessage != null) {
                     // Game has ended
                     end(gameEndMessage);
@@ -69,7 +75,7 @@ public class GameUI implements Runnable {
                 // Get and print update message if any exists
                 var message = inbox.getAll(new ActualField(MessageType.Update), new FormalField(Object.class),
                         new FormalField(String.class));
-                
+
                 if (message.size() > 0) {
                     printUpdateMessage(message);
                 }
@@ -101,7 +107,7 @@ public class GameUI implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            }
+        }
     }
 
     private void end(Object[] message) {
@@ -110,7 +116,8 @@ public class GameUI implements Runnable {
     }
 
     private void printUpdateMessage(Object[] message) {
-        List<Object[]> list = new ArrayList<Object[]>() {};
+        List<Object[]> list = new ArrayList<Object[]>() {
+        };
         list.add(message);
         printUpdateMessage(list);
     }
@@ -119,7 +126,7 @@ public class GameUI implements Runnable {
         System.out.println("===========================================");
         System.out.println("UPDATE FROM GAME:");
         for (Object[] messageArray : message) {
-            System.out.println((String)messageArray[2]);
+            System.out.println((String) messageArray[2]);
         }
         System.out.println("===========================================");
     }
@@ -153,6 +160,17 @@ public class GameUI implements Runnable {
         while (getChoice) {
 
             try {
+                Object[] update = inbox.getp(new ActualField(MessageType.PlayerMessage),
+                        new FormalField(Object.class), new FormalField(String.class));
+
+                if (update != null) {
+                    GameStateUpdate gsu = (GameStateUpdate)update[1];
+                    possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
+                    hand = new ArrayList<Card>(Arrays.asList(gsu.hand));
+                    possibleActions = new ArrayList<PlayerAction>(
+                            Arrays.asList(gsu.possibleActions));
+                    gameState = gsu.gameState;
+                }
 
                 if (possibleActions.contains(PlayerAction.PLAY))
                     printHand(hand);
