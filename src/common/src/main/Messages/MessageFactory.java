@@ -1,7 +1,5 @@
 package common.src.main.Messages;
 
-import java.util.List;
-
 import common.src.main.Card;
 import common.src.main.GameState;
 import common.src.main.IMessage;

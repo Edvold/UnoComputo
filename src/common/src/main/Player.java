@@ -1,7 +1,6 @@
 package common.src.main;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.jspace.ActualField;
 import org.jspace.FormalField;
