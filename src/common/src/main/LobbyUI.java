@@ -84,7 +84,8 @@ public class LobbyUI {
         }
     }
 
-    public void stop() {
+    public void stop() throws InterruptedException {
         isRunning = false;
+        inbox.put(new UpdateMessage("Closing LobbyUI...").getFields());
     }
 }
