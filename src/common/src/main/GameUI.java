@@ -77,6 +77,7 @@ public class GameUI implements Runnable {
                     objectChecker = new ObjectChecker(outbox);
                     objectCheckerThread.join(10);
                     objectCheckerThread = new Thread(objectChecker);
+                    objectCheckerThread.setDaemon(true);
                     objectCheckerThread.start();
 
                 } else {

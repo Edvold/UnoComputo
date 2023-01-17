@@ -76,12 +76,6 @@ public class LobbyUI {
                 e.printStackTrace();
             }
         }
-        try {
-            input.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public void stop() throws InterruptedException {
