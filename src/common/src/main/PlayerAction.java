@@ -2,7 +2,7 @@ package common.src.main;
 
 public enum PlayerAction {
     PLAY("Play a card"),
-    DRAW("Draw a card"),
+    DRAW("Draw card(s)"),
     UNO("Say \"uno!\""),
     OBJECT("Object"),
     ENDTURN("End your turn");
