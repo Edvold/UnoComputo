@@ -2,6 +2,7 @@ package common.src.main;
 
 import java.io.IOException;
 import org.jspace.QueueSpace;
+import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
 
@@ -47,7 +48,7 @@ public class Lobby implements Runnable {
         }
 
         Space hostSpace = new QueueSpace();
-        Space clientSpace = new QueueSpace();
+        Space clientSpace = new SequentialSpace();
 
         switch (option) {
             case 0 -> {
