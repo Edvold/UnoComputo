@@ -281,8 +281,12 @@ public class Game implements IGame {
     
     @Override
     public void endGame(String winner) {
+        // Inform all that new turn has begun
+        var nextPlayerMessage = new NextPlayerCommand(winner);    
         for (var p : players.values()) {
             IMessage message;
+            //send current game state to all
+            
             if (p.getPlayerName().equalsIgnoreCase(winner)) {
                 message = new GenericMessage(MessageType.GameOver, "Congratulations! You Won!");
             } else {
@@ -290,6 +294,11 @@ public class Game implements IGame {
             }
 
             try {
+                // Send message new turn message to all, noone gets token
+                p.getPlayerInbox().put(nextPlayerMessage.getFields());
+                // Send the gamestate to all
+                p.getPlayerInbox().put(new NewGameStateMessage(gameState).getFields());
+                // Send a game over message to all players
                 p.getPlayerInbox().put(message.getFields());
             } catch (InterruptedException e) {
                 e.printStackTrace();
