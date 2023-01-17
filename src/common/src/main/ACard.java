@@ -44,6 +44,15 @@ public abstract class ACard implements Comparable<ACard> {
 		return color + " " + action;
 	}
 
+	public String toStringWithColor(){
+		String color = this.getColor().toStringWithColor();
+		String action = this.getAction().toString();
+		if (color == Color.BLACK.toString().toLowerCase()) {
+			return action;
+		}
+		return color + " " + action;
+	}
+
 	public boolean isNumberCard() {
 		return switch (getAction()) {
 			case ZERO,ONE,TWO,THREE,FOUR,FIVE,SIX,SEVEN,EIGHT,NINE -> true;

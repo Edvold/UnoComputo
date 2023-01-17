@@ -286,12 +286,13 @@ public class GameUI implements Runnable {
 
         System.out.println("Your hand consist of the following cards:");
         for (ACard card : hand) {
-            System.out.println(counter++ + ". " + card.toString().toUpperCase());
+            System.out.println(counter++ + ". " + card.toStringWithColor());
         }
     }
 
     private void printTopCard() {
-        System.out.println("The top card is: " + gameState.topCard.toString().toUpperCase());
+        System.out.println("The top card is: " + gameState.topCard.toStringWithColor());
+
     }
 
     private void clearScreen() {
