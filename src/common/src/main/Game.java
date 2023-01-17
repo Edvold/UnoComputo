@@ -140,7 +140,6 @@ public class Game implements IGame {
                     player.getPlayerInbox()
                         .put(new UpdateMessage(text.toString()).getFields());
                 }
-                
             } else if(message instanceof DrawCardsCommand) {
                 var drawAmount = 1;
                 var reason = "";
@@ -187,13 +186,12 @@ public class Game implements IGame {
             } else {
                 System.out.println("unexpected message encountered and ignored: (" + message.getClass() + ") " + message.toString());
             }
-
-            updateStateTurnOrder();//? move down to moveTurnToNextPlayer??
         } while (
             message.getMessageType() != MessageType.PlayCardsCommand 
             && message.getMessageType() != MessageType.DrawCardsCommand
         ); 
 
+        updateStateTurnOrder();
         moveTurnToNextPlayer();
     }
 
