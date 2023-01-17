@@ -11,7 +11,6 @@ import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
 import common.src.main.Messages.MessageFactory;
-import common.src.main.Messages.NewGameStateMessage;
 import common.src.main.Messages.PlayCardsCommand;
 import common.src.main.Messages.PlayerMessage;
 import common.src.main.Messages.UpdateMessage;
@@ -29,13 +28,14 @@ public class Player implements IPlayer {
     private Thread callOutCheckerThread;
     private ArrayList<PlayerAction> actions;
     private boolean playedFirstCard;
+    private Boolean hasObjectedNoTurn = false;
 
     public Player(String name, Space gameSpace, Space UISpace, Space playerInbox) {
         playerName = name;
         this.UISpace = UISpace;
         this.gameSpace = gameSpace;
         this.playerInbox = playerInbox;
-        callOutCheckerThread = new Thread(new CallOutChecker(playerInbox, gameSpace, playerName));
+        callOutCheckerThread = new Thread(new CallOutChecker(playerInbox, gameSpace, playerName, hasObjectedNoTurn));
         callOutCheckerThread.setDaemon(true);
     }
 
@@ -89,6 +89,8 @@ public class Player implements IPlayer {
             if(gameOverMessage != null) {
                 token = ""; //Game has ended noone has a turn
             }
+
+            hasObjectedNoTurn = false;
 
             if (token.equals("turnToken")) {
                 // It is your turn
@@ -181,6 +183,10 @@ public class Player implements IPlayer {
                 }
             } else {
                 computeInitialActions(token);
+
+                if (hasObjectedNoTurn) {
+                    actions.remove(PlayerAction.OBJECT);
+                }
 
                 var newerStateList = playerInbox.getAll(
                         new ActualField(MessageType.NewGameState),
@@ -277,11 +283,14 @@ class CallOutChecker implements Runnable {
     private Space checkingSpace;
     private Space sendingSpace;
     private String playerName;
+    private Boolean hasObjected;
 
-    public CallOutChecker(Space checkSpace, Space sendSpace, String name) {
+    public CallOutChecker(Space checkSpace, Space sendSpace, String name, Boolean hasObjected) {
         this.checkingSpace = checkSpace;
         this.sendingSpace = sendSpace;
         this.playerName = name;
+        this.hasObjected = hasObjected;
+        this.hasObjected = false;
     }
 
     public void run() {
@@ -289,6 +298,7 @@ class CallOutChecker implements Runnable {
             while (true) {
                 checkingSpace.get(new ActualField(MessageType.UIMessage), new ActualField(PlayerAction.OBJECT),
                         new FormalField(String.class));
+                hasObjected = true;
                 sendingSpace.put(new CallOutCommand(playerName).getFields());
             }
         } catch (InterruptedException e) {
