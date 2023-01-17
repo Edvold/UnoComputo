@@ -96,6 +96,7 @@ public class Player implements IPlayer {
             if (token.equals("turnToken")) {
                 // It is your turn
                 computeInitialActions(token);
+                saidUNO = false;
                 while (token.equals("turnToken")) {
                     var newerStateList = playerInbox.getAll(
                         new ActualField(MessageType.NewGameState),
