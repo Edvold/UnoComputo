@@ -150,7 +150,7 @@ public class Player implements IPlayer {
                         (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
 
                 if(gameOverMessage != null) {
-                    UISpace.put(new GenericMessage(MessageType.GameOver, (String)gameOverMessage[2]));
+                    UISpace.put(new GenericMessage(MessageType.GameOver, (String)gameOverMessage[2]).getFields());
                     return;
                 }
             }
