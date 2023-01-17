@@ -61,7 +61,6 @@ public class Player implements IPlayer {
             if (token.equals("turnToken")) {
                 // It is your turn
                 computeInitialActions(token);
-                boolean sendNewGameState = true;
                 while (token.equals("turnToken")) {
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
@@ -70,21 +69,16 @@ public class Player implements IPlayer {
                     if (playables.size() == 0) {
                         actions.remove(PlayerAction.PLAY);
                     }
-                    if (sendNewGameState) {
-                        UISpace.put(new PlayerMessage(gameState, (Card[]) playables.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]),
-                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
-                    }
 
-                    sendNewGameState = true;
+                    UISpace.put(new PlayerMessage(gameState, (Card[]) playables.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]),
+                    (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
 
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
                     
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
-                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.Update) {
                         UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
-                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.NewGameState) {
                         int handsize = hand.size();
                         this.gameState = (GameState) newMessage[1];
@@ -109,7 +103,6 @@ public class Player implements IPlayer {
                                 break;
                             case OBJECT:
                                 gameSpace.put(new CallOutCommand(playerName).getFields());
-                                sendNewGameState = false;
                                 break;
                             case PLAY:
 
