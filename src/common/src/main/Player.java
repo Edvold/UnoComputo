@@ -11,6 +11,7 @@ import common.src.main.Messages.CallOutCommand;
 import common.src.main.Messages.DrawCardsCommand;
 import common.src.main.Messages.GenericMessage;
 import common.src.main.Messages.MessageFactory;
+import common.src.main.Messages.NewGameStateMessage;
 import common.src.main.Messages.PlayCardsCommand;
 import common.src.main.Messages.PlayerMessage;
 import common.src.main.Messages.UpdateMessage;
@@ -45,14 +46,41 @@ public class Player implements IPlayer {
         while (true) {
             playedFirstCard = false;
 
-            var turnMessage = playerInbox.get(new ActualField(MessageType.NextPlayerCommand),
-                    new FormalField(String.class), new FormalField(String.class));
-            this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
-                    new FormalField(GameState.class), new FormalField(String.class))[1]);
+            var message = playerInbox.get(IMessage.getGeneralTemplate().getFields());
+            
+            if (message[0] == MessageType.NewGameState) {
+                gameState = (GameState) message[1];
+                computeInitialActions(token);
+                ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
+                            ? getStackingCards(hand, gameState.topCard)
+                            : getPlayableCards(hand, gameState.topCard);
+                if (playables.size() == 0) {
+                    actions.remove(PlayerAction.PLAY);
+                }
+                UISpace.put(new PlayerMessage(
+                    gameState, 
+                    (Card[]) playables.toArray(new Card[0]), 
+                    (Card[]) hand.toArray(new Card[0]),
+                    (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
+                continue;
+            } else if(message[0] == MessageType.Update) {
+                UISpace.put(message);
+                continue;
+            } else if(message[0] == MessageType.NextPlayerCommand) {
+                token = (String) message[1];
+                gameState = (GameState)playerInbox.get(
+                    new ActualField(MessageType.NewGameState), 
+                    new FormalField(Object.class), 
+                    new FormalField(String.class))[1];
+            } else  {
+                playerInbox.put(message);
+                continue;
+            }
+
             var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
                     new FormalField(Object.class), new FormalField(String.class));
         
-            token = (String) turnMessage[1];
+            
 
             if(gameOverMessage != null) {
                 token = ""; //Game has ended noone has a turn
