@@ -58,19 +58,19 @@ public class Player implements IPlayer {
                 token = ""; //Game has ended noone has a turn
             }
 
-            var newerStateList = playerInbox.getAll(
-                        new ActualField(MessageType.NewGameState),
-                        new FormalField(GameState.class), 
-                        new FormalField(String.class));
-
-            if(newerStateList.size() > 0) {
-                gameState = (GameState) newerStateList.get(newerStateList.size() - 1)[1];
-            }
-
             if (token.equals("turnToken")) {
                 // It is your turn
                 computeInitialActions(token);
                 while (token.equals("turnToken")) {
+                    var newerStateList = playerInbox.getAll(
+                        new ActualField(MessageType.NewGameState),
+                        new FormalField(GameState.class), 
+                        new FormalField(String.class));
+
+                    if(newerStateList.size() > 0) {
+                        gameState = (GameState) newerStateList.get(newerStateList.size() - 1)[1];
+                    }
+
 
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
@@ -148,6 +148,16 @@ public class Player implements IPlayer {
                 }
             } else {
                 computeInitialActions(token);
+
+                var newerStateList = playerInbox.getAll(
+                        new ActualField(MessageType.NewGameState),
+                        new FormalField(GameState.class), 
+                        new FormalField(String.class));
+
+                if(newerStateList.size() > 0) {
+                    gameState = (GameState) newerStateList.get(newerStateList.size() - 1)[1];
+                }
+
                 // It is not your turn
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
