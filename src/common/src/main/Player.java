@@ -25,17 +25,18 @@ public class Player implements IPlayer {
     private Space UISpace;
     private Space gameSpace;
     private boolean saidUNO = false;
+    private CallOutChecker callOutChecker;
     private Thread callOutCheckerThread;
     private ArrayList<PlayerAction> actions;
     private boolean playedFirstCard;
-    private Boolean hasObjectedNoTurn = false;
 
     public Player(String name, Space gameSpace, Space UISpace, Space playerInbox) {
         playerName = name;
         this.UISpace = UISpace;
         this.gameSpace = gameSpace;
         this.playerInbox = playerInbox;
-        callOutCheckerThread = new Thread(new CallOutChecker(playerInbox, gameSpace, playerName, hasObjectedNoTurn));
+        callOutChecker = new CallOutChecker(playerInbox, gameSpace, playerName);
+        callOutCheckerThread = new Thread(callOutChecker);
         callOutCheckerThread.setDaemon(true);
     }
 
@@ -51,6 +52,7 @@ public class Player implements IPlayer {
             if (message[0] == MessageType.NewGameState) {
                 gameState = (GameState) message[1];
                 computeInitialActions(token);
+                callOutChecker.hasObjected = false;
                 ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
                             : getPlayableCards(hand, gameState.topCard);
@@ -90,7 +92,6 @@ public class Player implements IPlayer {
                 token = ""; //Game has ended noone has a turn
             }
 
-            hasObjectedNoTurn = false;
 
             if (token.equals("turnToken")) {
                 // It is your turn
@@ -185,7 +186,7 @@ public class Player implements IPlayer {
             } else {
                 computeInitialActions(token);
 
-                if (hasObjectedNoTurn) {
+                if (callOutChecker.hasObjected) {
                     actions.remove(PlayerAction.OBJECT);
                 }
 
@@ -284,14 +285,13 @@ class CallOutChecker implements Runnable {
     private Space checkingSpace;
     private Space sendingSpace;
     private String playerName;
-    private Boolean hasObjected;
+    public Boolean hasObjected;
 
-    public CallOutChecker(Space checkSpace, Space sendSpace, String name, Boolean hasObjected) {
+    public CallOutChecker(Space checkSpace, Space sendSpace, String name) {
         this.checkingSpace = checkSpace;
         this.sendingSpace = sendSpace;
         this.playerName = name;
-        this.hasObjected = hasObjected;
-        this.hasObjected = false;
+        hasObjected = false;
     }
 
     public void run() {
