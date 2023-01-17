@@ -72,6 +72,10 @@ public class Player implements IPlayer {
                     new ActualField(MessageType.NewGameState), 
                     new FormalField(Object.class), 
                     new FormalField(String.class))[1];
+            } else if(message[0] == MessageType.DrawCardsCommand) {
+                playerInbox.put(message);
+                getDrawnCards();
+                continue;
             } else  {
                 playerInbox.put(message);
                 continue;
