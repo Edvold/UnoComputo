@@ -80,10 +80,8 @@ public class Player implements IPlayer {
                     
                     if (newMessage[0] == MessageType.CallOutCommand) {
                         UISpace.put(new UpdateMessage("There has been an objection by " + newMessage[1]).getFields());
-                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.Update) {
                         UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
-                        sendNewGameState = false;
                     } else if (newMessage[0] == MessageType.NewGameState) {
                         int handsize = hand.size();
                         this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
