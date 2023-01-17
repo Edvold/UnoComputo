@@ -76,7 +76,6 @@ public class LobbyUI {
                 e.printStackTrace();
             }
         }
-        
     }
 
     public void stop() throws InterruptedException {

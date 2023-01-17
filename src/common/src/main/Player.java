@@ -35,6 +35,7 @@ public class Player implements IPlayer {
         this.gameSpace = gameSpace;
         this.playerInbox = playerInbox;
         callOutCheckerThread = new Thread(new CallOutChecker(playerInbox, gameSpace, playerName));
+        callOutCheckerThread.setDaemon(true);
     }
 
     @Override
@@ -146,13 +147,16 @@ public class Player implements IPlayer {
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
                 }
-                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
-                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
-
+                
                 if(gameOverMessage != null) {
                     UISpace.put(new GenericMessage(MessageType.GameOver, (String)gameOverMessage[2]).getFields());
+                    UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
+                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
                     return;
                 }
+
+                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
+                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
             }
         }
     }
