@@ -292,12 +292,12 @@ public class Game implements IGame {
             }
 
             try {
+                // Send a game over message to all players
+                p.getPlayerInbox().put(message.getFields());
                 // Send message new turn message to all, noone gets token
                 p.getPlayerInbox().put(nextPlayerMessage.getFields());
                 // Send the gamestate to all
                 p.getPlayerInbox().put(new NewGameStateMessage(gameState).getFields());
-                // Send a game over message to all players
-                p.getPlayerInbox().put(message.getFields());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
