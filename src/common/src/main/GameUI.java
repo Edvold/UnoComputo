@@ -50,9 +50,11 @@ public class GameUI implements Runnable {
                 gameState = gsu.gameState;
                 
                 // Reset objectCheckerThread
-                objectChecker.stop();
-                objectCheckerThread.interrupt();
-                Thread.sleep(1000);
+                if (objectCheckerThread.isAlive()) {
+                    objectChecker.stop();
+                    objectCheckerThread.interrupt();
+                    Thread.sleep(1000);
+                    }
 
 
                 // Print the current state of the game
