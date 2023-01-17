@@ -52,7 +52,6 @@ public class Player implements IPlayer {
             if (message[0] == MessageType.NewGameState) {
                 gameState = (GameState) message[1];
                 computeInitialActions(token);
-                callOutChecker.hasObjected = false;
                 ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
                             : getPlayableCards(hand, gameState.topCard);
@@ -74,6 +73,7 @@ public class Player implements IPlayer {
                     new ActualField(MessageType.NewGameState), 
                     new FormalField(Object.class), 
                     new FormalField(String.class))[1];
+                callOutChecker.hasObjected = false;
             } else if(message[0] == MessageType.DrawCardsCommand) {
                 playerInbox.put(message);
                 getDrawnCards();
