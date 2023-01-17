@@ -51,15 +51,19 @@ public class GameUI implements Runnable {
                 gameState = gsu.gameState;
                 
                 // Reset objectCheckerThread
-                if (objectCheckerThread.isAlive()) {
-                    objectChecker.stop();
-                    objectCheckerThread.interrupt();
-                    Thread.sleep(1000);
-                    }
+                stopObjectCheckerThread();                
 
 
                 // Print the current state of the game
                 printOverview();
+
+                // Has game ended?
+                var gameEndMessage = inbox.getp(new ActualField(MessageType.GameOver), new FormalField(Object.class), new FormalField(String.class));
+                
+                if (gameEndMessage != null) {
+                    // Game has ended
+                    end(gameEndMessage);
+                }
 
                 // Get and print update message if any exists
                 var message = inbox.getAll(new ActualField(MessageType.Update), new FormalField(Object.class),
@@ -83,6 +87,29 @@ public class GameUI implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private void stopObjectCheckerThread() {
+        if (objectCheckerThread.isAlive()) {
+            objectChecker.stop();
+            objectCheckerThread.interrupt();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            }
+    }
+
+    private void end(Object[] message) {
+        stopObjectCheckerThread();
+        printUpdateMessage(message);
+    }
+
+    private void printUpdateMessage(Object[] message) {
+        List<Object[]> list = new ArrayList<Object[]>() {};
+        list.add(message);
+        printUpdateMessage(list);
     }
 
     private void printUpdateMessage(List<Object[]> message) {
