@@ -59,7 +59,6 @@ public class Player implements IPlayer {
                 // It is your turn
                 computeInitialActions(token);
                 boolean sendNewGameState = true;
-                boolean justGotTurn = true;
                 while (token.equals("turnToken")) {
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
@@ -68,12 +67,11 @@ public class Player implements IPlayer {
                     if (playables.size() == 0) {
                         actions.remove(PlayerAction.PLAY);
                     }
-                    if (sendNewGameState || justGotTurn) {
+                    if (sendNewGameState) {
                         UISpace.put(new PlayerMessage(gameState, (Card[]) playables.toArray(new Card[0]), (Card[]) hand.toArray(new Card[0]),
                         (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
                     }
 
-                    justGotTurn = false;
                     sendNewGameState = true;
 
                     var newMessage = playerInbox.get(IMessage.getGeneralTemplate().getFields());
