@@ -35,7 +35,7 @@ public class GameState {
         }
 
         public String toString() {
-            return userName + " with " + handSize + " cards on their hand";
+            return userName + ": " + handSize + " cards";
         }
     }
 }

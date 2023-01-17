@@ -129,11 +129,13 @@ public class GameUI implements Runnable {
         if (gameState.saidUNO)
             System.out.println(gameState.turnOrder[gameState.turnOrder.length - 1].userName + " has said UNO!");
         System.out.println("A new round has begun!");
-        System.out.println("The turn-order is:");
+        System.out.println("The turn-order is:\n");
 
         for (PlayerState player : gameState.turnOrder) {
             System.out.println(player.toString());
         }
+
+        System.out.println();
 
         System.out.println("It is currently " + (gameState.currentPlayerName.userName.equals(userName) ? "your turn"
                 : (gameState.currentPlayerName.userName + "'s turn")));
