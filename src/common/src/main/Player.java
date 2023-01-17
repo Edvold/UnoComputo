@@ -148,8 +148,9 @@ public class Player implements IPlayer {
                                 saidUNO = true;
                                 actions.remove(PlayerAction.UNO);
                                 break;
-                            case OBJECT:
+                                case OBJECT:
                                 gameSpace.put(new CallOutCommand(playerName).getFields());
+                                actions.remove(PlayerAction.OBJECT);
                                 break;
                             case PLAY:
 
