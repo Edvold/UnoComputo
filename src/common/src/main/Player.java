@@ -84,6 +84,9 @@ public class Player implements IPlayer {
                     } else if (newMessage[0] == MessageType.Update) {
                         UISpace.put(new UpdateMessage((String) newMessage[2]).getFields());
                         sendNewGameState = false;
+                    } else if (newMessage[0] == MessageType.NewGameState) {
+                        this.gameState = ((GameState) playerInbox.get(new ActualField(MessageType.NewGameState),
+                        new FormalField(GameState.class), new FormalField(String.class))[1]);
                     } else if (newMessage[0] == MessageType.UIMessage) {
                         PlayerAction action = (PlayerAction) newMessage[1];
                         switch (action) {
