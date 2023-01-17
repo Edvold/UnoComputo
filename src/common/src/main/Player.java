@@ -62,9 +62,21 @@ public class Player implements IPlayer {
                 // It is your turn
                 computeInitialActions(token);
                 while (token.equals("turnToken")) {
+
+                    var newerStateList = playerInbox.getAll(
+                        new ActualField(MessageType.NewGameState),
+                        new FormalField(GameState.class), 
+                        new FormalField(String.class));
+
+                    if(newerStateList.size() > 0) {
+                        gameState = (GameState) newerStateList.get(newerStateList.size() - 1)[1];
+                    }
+
                     ArrayList<Card> playables = playedFirstCard || gameState.streak > 0
                             ? getStackingCards(hand, gameState.topCard)
                             : getPlayableCards(hand, gameState.topCard);
+
+
 
                     if (playables.size() == 0) {
                         actions.remove(PlayerAction.PLAY);
