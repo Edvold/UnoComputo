@@ -56,8 +56,6 @@ public class Card extends ACard {
     public void resetWildCard() {
         if(action == WILD || action == WILDDRAW4){
             color = BLACK; 
-        } else {
-            //throw new RuntimeException("You cannot reset a card that is not a wildcard");
         }
     }
     

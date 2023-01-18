@@ -35,8 +35,8 @@ public class Game implements IGame {
     public Game(Map<String, IPlayerConnection> players, Space inbox) {
         this.players = players;
         this.inbox = inbox;
-        playerNames = new ArrayList(players.keySet());
-        playersHandSize = new HashMap(players.size());
+        playerNames = new ArrayList<String>(players.keySet());
+        playersHandSize = new HashMap<String, Integer>(players.size());
         gameState = new GameState();
     }
 
@@ -327,10 +327,6 @@ public class Game implements IGame {
 
     private String currentPlayer() {
         return gameState.turnOrder[0].userName;
-    }
-
-    private String nextPlayer() {
-        return gameState.turnOrder[1].userName;
     }
 
     private String previousPlayer() {

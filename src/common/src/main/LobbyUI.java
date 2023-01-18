@@ -72,7 +72,6 @@ public class LobbyUI {
                     System.out.println(Arrays.toString(message));
                 }
             } catch (InterruptedException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
