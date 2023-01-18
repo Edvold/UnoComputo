@@ -166,7 +166,6 @@ public class Game implements IGame {
                 var playCommand = (PlayCardsCommand) message;
                 var playedCards = playCommand.getState();
                 var action = playedCards[0].getAction();
-                //TODO validate cards can be played
                 if (action == Action.SKIP) {
                     skip(playedCards.length);
                 } else if (action == Action.REVERSE) {
