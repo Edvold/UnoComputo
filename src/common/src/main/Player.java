@@ -28,6 +28,7 @@ public class Player implements IPlayer {
     private Thread callOutCheckerThread;
     private ArrayList<PlayerAction> actions;
     private boolean playedFirstCard;
+    private boolean gameOver = false;
 
     public Player(String name, Space gameSpace, Space UISpace, Space playerInbox) {
         playerName = name;
@@ -78,20 +79,15 @@ public class Player implements IPlayer {
                 playerInbox.put(message);
                 getDrawnCards();
                 continue;
-            } else  {
+            } else if (message[0] == MessageType.GameOver) {
+                UISpace.put(new GenericMessage(MessageType.GameOver, (String)message[2]).getFields());
+                UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
+                    (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
+            } 
+            else  {
                 playerInbox.put(message);
                 continue;
             }
-
-            var gameOverMessage = playerInbox.getp(new ActualField(MessageType.GameOver),
-                    new FormalField(Object.class), new FormalField(String.class));
-        
-            
-
-            if(gameOverMessage != null) {
-                token = ""; //Game has ended noone has a turn
-            }
-
 
             if (token.equals("turnToken")) {
                 // It is your turn
@@ -199,13 +195,6 @@ public class Player implements IPlayer {
                 // It is not your turn
                 if (!callOutCheckerThread.isAlive()) {
                     callOutCheckerThread.start();
-                }
-                
-                if(gameOverMessage != null) {
-                    UISpace.put(new GenericMessage(MessageType.GameOver, (String)gameOverMessage[2]).getFields());
-                    UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
-                        (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
-                    return;
                 }
 
                 UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),

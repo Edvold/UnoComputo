@@ -57,6 +57,7 @@ public class GameUI implements Runnable {
                 gameState = gsu.gameState;
 
                 // Reset objectCheckerThread
+
                 stopObjectCheckerThread();
 
                 // Print the current state of the game
@@ -67,6 +68,7 @@ public class GameUI implements Runnable {
                         new FormalField(String.class));
 
                 if (gameEndMessage != null) {
+
                     // Game has ended
                     end(gameEndMessage);
                     break;
