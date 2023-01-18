@@ -207,6 +207,8 @@ public class Player implements IPlayer {
 
                 UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
                         (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
+
+                if (gameOver) return;
             }
         }
     }
