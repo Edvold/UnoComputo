@@ -116,6 +116,7 @@ public class GameUI implements Runnable {
     private void end(Object[] message) {
         stopObjectCheckerThread();
         printUpdateMessage(message);
+        System.exit(0);
     }
 
     private void printUpdateMessage(Object[] message) {
