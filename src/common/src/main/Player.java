@@ -76,8 +76,6 @@ public class Player implements IPlayer {
                     new FormalField(String.class))[1];
                 callOutChecker.hasObjected = false;
 
-                if (gameOver) return;
-
             } else if(message[0] == MessageType.DrawCardsCommand) {
                 playerInbox.put(message);
                 getDrawnCards();
@@ -203,6 +201,8 @@ public class Player implements IPlayer {
 
                 UISpace.put(new PlayerMessage(gameState, new Card[0], hand.toArray(new Card[hand.size()]),
                         (PlayerAction[]) actions.toArray(new PlayerAction[0])).getFields());
+
+                if (gameOver) return;
             }
         }
     }

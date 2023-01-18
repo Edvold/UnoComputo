@@ -45,7 +45,8 @@ public class GameUI implements Runnable {
                 GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
                         new FormalField(Object.class), new FormalField(String.class))[1];
                 
-                inbox.getAll(  //If any older states exits, throw them away
+
+                        inbox.getAll(  //If any older states exits, throw them away
                     new ActualField(MessageType.PlayerMessage), 
                     new FormalField(Object.class), 
                     new FormalField(String.class));
