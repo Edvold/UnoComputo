@@ -41,15 +41,15 @@ public class GameUI implements Runnable {
         try {
 
             while (true) {
-
+                
+                // Get the current gamestate
                 GameStateUpdate gsu = (GameStateUpdate) inbox.get(new ActualField(MessageType.PlayerMessage),
                         new FormalField(Object.class), new FormalField(String.class))[1];
                 
-
-                        inbox.getAll(  //If any older states exits, throw them away
-                    new ActualField(MessageType.PlayerMessage), 
-                    new FormalField(Object.class), 
-                    new FormalField(String.class));
+                inbox.getAll(  //If any older states exits, throw them away
+                new ActualField(MessageType.PlayerMessage), 
+                new FormalField(Object.class), 
+                new FormalField(String.class));
 
                 ArrayList<Card> possibleCards = new ArrayList<Card>(Arrays.asList(gsu.possibleCards));
                 ArrayList<Card> hand = new ArrayList<Card>(Arrays.asList(gsu.hand));
@@ -58,7 +58,6 @@ public class GameUI implements Runnable {
                 gameState = gsu.gameState;
 
                 // Reset objectCheckerThread
-
                 stopObjectCheckerThread();
 
                 // Print the current state of the game
@@ -84,6 +83,7 @@ public class GameUI implements Runnable {
                 }
 
                 if (possibleActions.size() == 1 && possibleActions.contains(PlayerAction.OBJECT)) {
+                    // Start new object checker thread
                     objectChecker = new ObjectChecker(outbox);
                     objectCheckerThread.join(10);
                     objectCheckerThread = new Thread(objectChecker);
@@ -343,7 +343,7 @@ class ObjectChecker implements Runnable {
         try {
             String input = reader.readLine();
             if (input.equals("1")) {
-                System.out.println("Got input");
+                System.out.println("Got objection");
                 outbox.put(new UIMessage(PlayerAction.OBJECT, "").getFields());
             }
 
