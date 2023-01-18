@@ -4,7 +4,13 @@ UnoComputo is a program developed in 2023 following course 02148 Introduction to
 It enables you to play a game of uno with 2-8 friends via the terminal on different computers.
 
 ## Setup
-Running the program will place you in the lobby
+The program requires Java 17 as a minimum.
+
+Compile to JAR-file.
+
+Run the program by running `java -jar UnoComputo.jar` in a terminal from the folder containing the JAR-file.
+
+Running the program will place you in the lobby.
 
 Here you have two options: To host a game or to join a game.
 
