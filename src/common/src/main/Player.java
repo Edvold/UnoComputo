@@ -211,8 +211,7 @@ public class Player implements IPlayer {
     @Override
     public ArrayList<Card> getPlayableCards(ArrayList<Card> hand, Card topCard) {
         // finds playable cards
-        ArrayList<Card> playables = new ArrayList<>(hand); // This will work if cards aren't changed until after they
-                                                           // are played
+        ArrayList<Card> playables = new ArrayList<>(hand);
         playables.removeIf(card -> !card.canBePlayedOn(topCard));
         return playables;
     }
