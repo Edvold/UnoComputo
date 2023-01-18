@@ -238,18 +238,6 @@ public class Player implements IPlayer {
         return stackables;
     }
 
-    @Override
-    public String computeReturnToken(String ID) {
-        return ID.equals("object") ? "null" : "TurnToken";
-        // This method is not needed
-    }
-
-    // getters and setters
-
-    public void setHand(ArrayList<Card> newHand) {
-        hand = newHand;
-    }
-
     private void getDrawnCards() throws InterruptedException {
         var template = new DrawCardsCommand().getTemplateBuilder()
                 .addActualType()
