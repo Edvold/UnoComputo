@@ -60,7 +60,7 @@ public class Game implements IGame {
                 }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace(); // TODO error handeling
+            e.printStackTrace();
         }  
     }
 

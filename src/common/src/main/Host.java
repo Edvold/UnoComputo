@@ -42,9 +42,8 @@ public final class Host implements Runnable {
         try {
             ui.showMessage("Your ip is: " + ip);
             ui.showMessage("Now waiting for players to join...");
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         openHostInputListener(lobbySpace);
 
@@ -77,7 +76,6 @@ public final class Host implements Runnable {
                         try {
                             outbox.put(update.getFields());
                         } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     });
@@ -104,7 +102,6 @@ public final class Host implements Runnable {
 
         
     
-        // TODO start game.
         // - Game is managed by controler that starts thread and manages the game
         // progressing
         var startGameMessage = new GenericMessage(MessageType.StartGame, "Game is starting now!");
@@ -112,7 +109,6 @@ public final class Host implements Runnable {
             try {
                 outbox.put(startGameMessage.getFields());
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         });
@@ -132,13 +128,11 @@ public final class Host implements Runnable {
         try {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             
             try {
                 ip = ui.getInput("Could not determine local adress to host game.\nEnter the local ip-address to continue: ");
             } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         }

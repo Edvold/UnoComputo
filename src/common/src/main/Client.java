@@ -89,7 +89,6 @@ public class Client implements Runnable {
                     ui.showMessage(message);
                 }
             }
-            //TODO handle messages
         }
 
         ui.stop();
@@ -112,7 +111,6 @@ public class Client implements Runnable {
         try {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         int port = 9001;
@@ -131,9 +129,8 @@ public class Client implements Runnable {
                 } catch (NumberFormatException e) {
                     ui.showMessage("Not a valid port number: " + e.getMessage());
                 }
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
