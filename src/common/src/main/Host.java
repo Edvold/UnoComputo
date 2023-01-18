@@ -155,7 +155,6 @@ public final class Host implements Runnable {
             playerSpaces.put(name, responseSpace);
             responseSpace.put(new UpdateMessage("Accepted").getFields());
         } catch (InterruptedException | IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
