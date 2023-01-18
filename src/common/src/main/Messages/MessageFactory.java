@@ -11,7 +11,7 @@ import static common.src.main.MessageType.*;
 public class MessageFactory {
     public static IMessage create(Object[] fields) {
         return switch ((MessageType) fields[0]) {
-            case NextPlayerCommand -> new NextPlayerCommand((String) fields[1], (String) fields[2]); 
+            case NextPlayerCommand -> new NextPlayerCommand((String) fields[1]); 
             case PlayCardsCommand -> new PlayCardsCommand((String) fields[2], (Card[])fields[1]); 
             case DrawCardsCommand -> new DrawCardsCommand((Card[])fields[1], (String) fields[2]); 
             case CallOutCommand -> new CallOutCommand((String) fields[2]); 

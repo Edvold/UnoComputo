@@ -3,11 +3,11 @@ package common.src.main.Messages;
 import static common.src.main.MessageType.NextPlayerCommand;;
 
 public final class NextPlayerCommand extends AStateMessage<String> {
-    public NextPlayerCommand(String player) {
-        this("", player);
+    public NextPlayerCommand() {
+        this("");
     }
 
-    public NextPlayerCommand(String turnToken, String player) {
-        super(NextPlayerCommand, turnToken, player);
+    public NextPlayerCommand(String turnToken) {
+        super(NextPlayerCommand, turnToken, "");
     }
 }

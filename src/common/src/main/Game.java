@@ -100,7 +100,7 @@ public class Game implements IGame {
         // Inform all that new turn has begun
         for (var player : players.values()){
             if(player.getPlayerName().equals(currentPlayer)) {
-                player.getPlayerInbox().put(new NextPlayerCommand("turnToken", currentPlayer).getFields());
+                player.getPlayerInbox().put(new NextPlayerCommand("turnToken").getFields());
             } else {
                 player.getPlayerInbox().put(nextPlayerNoTokenMessage.getFields());
             }
