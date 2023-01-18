@@ -14,6 +14,7 @@ The game ends when a person has zero cards left on their hand.
 One player has their turn.
 They can either play a card, draw a card, say uno, object and end their turn.
 - The UI only shows legal actions so if you cannot play any of your card a play option will not be shown.
+
 Meanwhile other players will have the opportunity to object.
 The other players will get an update of the new gamestate when the current player ends their turn.
 
