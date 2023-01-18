@@ -76,7 +76,11 @@ public class Player implements IPlayer {
                     new FormalField(String.class))[1];
                 callOutChecker.hasObjected = false;
 
-                if (gameOver) return;
+                if (gameOver) {
+                    callOutCheckerThread.interrupt();
+                    callOutCheckerThread.join(100);
+                    return;
+                }
 
             } else if(message[0] == MessageType.DrawCardsCommand) {
                 playerInbox.put(message);
