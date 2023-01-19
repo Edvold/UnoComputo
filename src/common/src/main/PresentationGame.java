@@ -52,16 +52,16 @@ public class PresentationGame extends Game {
 
         var player4Cards = List.of(
             new Card(BLUE, REVERSE),
-            new Card(BLUE, ONE),
             new Card(GREEN, ONE),
-            new Card(RED, ONE),
-            new Card(YELLOW, ONE),
+            new Card(GREEN, ONE),
+            new Card(BLUE, ONE),
+            new Card(BLUE, ONE),
+            new Card(BLUE, TWO),
             new Card(GREEN, THREE),
-            new Card(YELLOW, THREE),
             new Card(BLUE, THREE),
-            new Card(YELLOW, THREE),
-            new Card(GREEN, THREE),
-            new Card(BLUE, THREE)
+            new Card(BLUE, THREE),
+            new Card(RED, THREE),
+            new Card(RED, THREE)
         );
 
         var cards = new ArrayList<Card>(108);
