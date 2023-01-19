@@ -90,7 +90,11 @@ public class GameUI implements Runnable {
                     objectCheckerThread.setDaemon(true);
                     objectCheckerThread.start();
 
-                } else {
+                } else if (possibleActions.size() == 0) {
+                    continue;
+                } 
+                
+                else {
                     takeTurn(possibleCards, hand, possibleActions);
                 }
             }
