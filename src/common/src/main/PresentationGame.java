@@ -2,10 +2,9 @@ package common.src.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
+import java.util.Random;
 
 import org.jspace.Space;
 
@@ -59,6 +58,9 @@ public class PresentationGame extends Game {
             new Card(YELLOW, ONE),
             new Card(GREEN, THREE),
             new Card(YELLOW, THREE),
+            new Card(BLUE, THREE),
+            new Card(YELLOW, THREE),
+            new Card(GREEN, THREE),
             new Card(BLUE, THREE)
         );
 
@@ -85,7 +87,7 @@ public class PresentationGame extends Game {
         cards.removeAll(player2Cards);
         cards.removeAll(player3Cards);
         cards.removeAll(player4Cards);
-        Collections.shuffle(cards);
+        Collections.shuffle(cards, new Random(1));
 
         try {
             for (Card card : cards) {
