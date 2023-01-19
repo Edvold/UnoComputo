@@ -3,11 +3,13 @@ package common.src.main;
 import java.util.Stack;
 
 import org.jspace.RandomSpace;
+import org.jspace.SequentialSpace;
 import org.jspace.Space;
+import org.jspace.StackSpace;
 
 interface IGame {
 
-    Space deck = new RandomSpace();
+    Space deck = new StackSpace();
     Stack<Card> discardPile = new Stack<>();
 
     void startGame();

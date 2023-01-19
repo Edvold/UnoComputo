@@ -120,7 +120,7 @@ public final class Host implements Runnable {
             playerConections.put(entry.getKey(), connection);
         }
 
-        IGame game = new Game(playerConections, lobbySpace);
+        IGame game = new PresentationGame(playerConections, lobbySpace);
         var gameController = new GameController(game);
         gameController.start();
     }
