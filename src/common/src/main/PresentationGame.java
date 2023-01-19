@@ -52,8 +52,8 @@ public class PresentationGame extends Game {
 
         var player4Cards = List.of(
             new Card(BLUE, REVERSE),
-            new Card(GREEN, ONE),
-            new Card(GREEN, ONE),
+            new Card(RED, ONE),
+            new Card(BLUE, ONE),
             new Card(BLUE, ONE),
             new Card(BLUE, ONE),
             new Card(BLUE, TWO),
